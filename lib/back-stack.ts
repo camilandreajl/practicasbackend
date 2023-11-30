@@ -1,7 +1,7 @@
 import { Duration, Expiration, RemovalPolicy, Stack, StackProps, Tags } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as apiGateway from 'aws-cdk-lib/aws-apigateway';
-// import { GraphqlApi, AuthorizationType, FieldLogLevel, SchemaFile } from 'aws-cdk-lib/aws-appsync';
+import * as cdk from 'aws-cdk-lib';
 import * as path from 'path';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as s3 from 'aws-cdk-lib/aws-s3';
@@ -9,16 +9,25 @@ import * as rds from 'aws-cdk-lib/aws-rds';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as secretsManager from 'aws-cdk-lib/aws-secretsmanager';
-import { CUSTOMER, PROJECT } from '../config';
+import { BUCKETS, CIDR_RANGE, CUSTOMER, PROJECT } from '../config';
+import { BucketInput, Environment } from 'types';
 
 export class BackStack extends Stack {
-  constructor(scope: Construct, id: string, props?: StackProps) {
+  deployEnvironment: Environment;
+  constructor(scope: Construct, id: string, props?: StackProps, env?: Environment | undefined) {
     super(scope, id, props);
-    const vpc = this.getPrevalentVPC()
-    const cluster = this.buildDatabase(vpc);
-    const lambda = this.buildLambda(cluster);
+
+    this.deployEnvironment = env || Environment.DEV;
+
+    const vpc = this.buildVPC();
+    const securityGroup = this.buildDatabaseSecurityGroup(vpc);
+    const cluster = this.buildDatabase(vpc, securityGroup);
+    const lambda = this.buildServerLambda(cluster);
     const api = this.buildApiGateway(lambda);
-    const s3 = this.buildS3();
+
+    BUCKETS.forEach((bucket) =>
+      this.buildS3({ name: `${bucket.name}-${env}`, isPublic: bucket.isPublic || false })
+    );
   }
 
   addCustomerTags = (scope: Construct) => {
@@ -26,8 +35,52 @@ export class BackStack extends Stack {
     Tags.of(scope).add('type', 'customer');
   };
 
+  buildVPC() {
+    const identifier = `${CUSTOMER}-${PROJECT}-vpc-${this.deployEnvironment}`;
+    const vpc = new ec2.Vpc(this, identifier, {
+      vpcName: identifier,
+      ipAddresses: ec2.IpAddresses.cidr(CIDR_RANGE),
+      maxAzs: 2,
+      natGateways: 0, // Disable NAT gateways
+      subnetConfiguration: [
+        {
+          subnetType: ec2.SubnetType.PUBLIC,
+          name: 'Public',
+          cidrMask: 24,
+          // Enable auto-assign public IPv4 address
+          mapPublicIpOnLaunch: true,
+        },
+        {
+          subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
+          name: 'Private',
+          cidrMask: 24,
+        },
+      ],
+    });
+    return vpc;
+  }
+
+  buildDatabaseSecurityGroup(vpc: ec2.Vpc) {
+    const identifier = `db-sg-${this.deployEnvironment}`;
+    const securityGroup = new ec2.SecurityGroup(this, identifier, {
+      securityGroupName: identifier,
+      vpc,
+      description: 'Allow postgres access',
+      allowAllOutbound: true, // set to false if you want to control outbound traffic
+    });
+
+    securityGroup.addIngressRule(
+      ec2.Peer.anyIpv4(), // or specify a particular CIDR block or security group
+      ec2.Port.tcp(5432)
+    );
+
+    return securityGroup;
+  }
+
   buildApiGateway(lambda: lambda.DockerImageFunction) {
-    const apiGw = new apiGateway.LambdaRestApi(this, `${CUSTOMER}_${PROJECT}_GraphQL_Endpoint`, {
+    const identifier = `${CUSTOMER}-${PROJECT}-api-${this.deployEnvironment}`;
+    const apiGw = new apiGateway.LambdaRestApi(this, identifier, {
+      restApiName: identifier,
       handler: lambda,
       defaultCorsPreflightOptions: {
         allowOrigins: apiGateway.Cors.ALL_ORIGINS,
@@ -39,23 +92,20 @@ export class BackStack extends Stack {
     return apiGw;
   }
 
-  buildLambda(cluster?: rds.DatabaseInstance) {
+  buildServerLambda(cluster?: rds.DatabaseInstance) {
     // Lambda resolver
+    const identifier = `${CUSTOMER}-${PROJECT}-server-${this.deployEnvironment}`;
     const dockerfile = path.join(__dirname, '../api');
-    const dockerLambda = new lambda.DockerImageFunction(
-      this,
-      `${CUSTOMER}_${PROJECT}_DockerLambda`,
-      {
-        functionName: `${CUSTOMER}_${PROJECT}_DockerLambda`,
-        code: lambda.DockerImageCode.fromImageAsset(dockerfile),
-        memorySize: 1024,
-        timeout: Duration.seconds(60),
-        environment: {
-          SECRET_ID: cluster?.secret?.secretArn || '',
-          AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
-        },
-      }
-    );
+    const dockerLambda = new lambda.DockerImageFunction(this, identifier, {
+      functionName: identifier,
+      code: lambda.DockerImageCode.fromImageAsset(dockerfile),
+      memorySize: 1024,
+      timeout: Duration.seconds(60),
+      environment: {
+        SECRET_ID: cluster?.secret?.secretArn || '',
+        AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
+      },
+    });
     this.addCustomerTags(dockerLambda);
     if (cluster) {
       // Grant access to Secrets manager to fetch the secret
@@ -70,57 +120,61 @@ export class BackStack extends Stack {
     return dockerLambda;
   }
 
-  buildDatabase(vpc: ec2.IVpc) {
-    const sg = ec2.SecurityGroup.fromSecurityGroupId(this, 'sg-70719049', 'sg-70719049');
+  buildDatabase(vpc: ec2.IVpc, securityGroup: ec2.SecurityGroup) {
     // secret for postgres database
-    const databaseSecret = new secretsManager.Secret(
-      this,
-      `${CUSTOMER}_${PROJECT}_DatabaseSecret`,
-      {
-        secretName: `${CUSTOMER}_${PROJECT}_DatabaseSecret`,
-        generateSecretString: {
-          secretStringTemplate: JSON.stringify({
-            username: 'postgres',
-          }),
-          generateStringKey: 'password',
-          excludeCharacters: '"@/\\-#{[()]};:=`',
-        },
-      }
-    );
+    const secretIdentifier = `${CUSTOMER}-${PROJECT}-dbsecret-${this.deployEnvironment}`;
+    const databaseSecret = new secretsManager.Secret(this, secretIdentifier, {
+      secretName: secretIdentifier,
+      generateSecretString: {
+        secretStringTemplate: JSON.stringify({
+          username: 'postgres', // cambiarlo si es necesario dependiendo del cliente.
+        }),
+        generateStringKey: 'password',
+        excludeCharacters: '"@/\\-#{[()]};:=`',
+      },
+    });
     this.addCustomerTags(databaseSecret);
     // postgres rds database
-    const cluster = new rds.DatabaseInstance(this, `${CUSTOMER.toLowerCase()}-db`, {
-      allocatedStorage:20,
-      instanceIdentifier: `${CUSTOMER.toLowerCase()}-db`,
-      databaseName: `${PROJECT.toLowerCase().replace(/-/g, '_')}`,
+
+    const project = PROJECT.toLowerCase().replace(/-/g, '_');
+    const identifier = `${CUSTOMER.toLowerCase()}-${project}-db-${this.deployEnvironment}`;
+
+    const cluster = new rds.DatabaseInstance(this, identifier, {
       engine: rds.DatabaseInstanceEngine.postgres({
-        version: rds.PostgresEngineVersion.VER_14_5,
+        version: rds.PostgresEngineVersion.VER_15_4,
       }),
+      instanceType: ec2.InstanceType.of(
+        ec2.InstanceClass.T3,
+        this.deployEnvironment === Environment.PROD
+          ? ec2.InstanceSize.MEDIUM
+          : ec2.InstanceSize.MICRO
+      ),
       vpc,
-      instanceType: ec2.InstanceType.of(ec2.InstanceClass.T3, ec2.InstanceSize.MICRO),
-      credentials: rds.Credentials.fromSecret(databaseSecret),
-      securityGroups: [sg],
       vpcSubnets: {
         subnetType: ec2.SubnetType.PUBLIC,
       },
+      credentials: rds.Credentials.fromSecret(databaseSecret),
+      allocatedStorage: 20,
+      instanceIdentifier: identifier,
+      databaseName: `${project}`,
+      multiAz: false,
+      publiclyAccessible: true,
+      storageType: rds.StorageType.GP2,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      securityGroups: [securityGroup],
     });
+
     this.addCustomerTags(cluster);
     return cluster;
   }
 
-  buildS3() {
-    const s3Bucket = new s3.Bucket(this, 's3-bucket', {
-      bucketName: `${CUSTOMER.toLowerCase()}-${PROJECT.toLowerCase()}`,
-      blockPublicAccess: {
-        blockPublicAcls: false,
-        blockPublicPolicy: false,
-        ignorePublicAcls: false,
-        restrictPublicBuckets: false,
-      },
+  buildS3({ name, isPublic = false }: BucketInput) {
+    const s3Bucket = new s3.Bucket(this, `s3-bucket-${name}`, {
+      bucketName: name,
       autoDeleteObjects: true,
       removalPolicy: RemovalPolicy.DESTROY,
       versioned: false,
-      publicReadAccess: true,
+      publicReadAccess: isPublic,
       objectOwnership: s3.ObjectOwnership.OBJECT_WRITER,
       encryption: s3.BucketEncryption.S3_MANAGED,
       cors: [
@@ -130,15 +184,18 @@ export class BackStack extends Stack {
           allowedHeaders: ['*'],
         },
       ],
+      ...(isPublic
+        ? {
+            blockPublicAccess: {
+              blockPublicAcls: false,
+              blockPublicPolicy: false,
+              ignorePublicAcls: false,
+              restrictPublicBuckets: false,
+            },
+          }
+        : {}),
     });
     this.addCustomerTags(s3Bucket);
     return s3Bucket;
-  }
-
-  getPrevalentVPC() {
-    const vpc = ec2.Vpc.fromLookup(this, 'VPC', {
-      vpcId: 'vpc-87b759fa',
-    });
-    return vpc;
   }
 }

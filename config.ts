@@ -1,7 +1,15 @@
-const CUSTOMER = 'NombreDelCliente';
-const PROJECT = 'NombreDelProyecto';
-const APP_NAME = 'NombreDeLaApp';
+import { BucketInput } from 'types';
+
+// actualizar información según el cliente y su organización
+const CUSTOMER = 'prevalentware';
+const PROJECT = 'boilerplate';
+const APP_NAME = 'boilerplate';
 const REGION = 'us-east-1';
+const ACCOUNT = '978879774573';
+const CIDR_RANGE = '15.0.0.0/16'; // este rango de CIDR se debe consultar en el SharePoint de infraestructura.
 
+// actualizar información según los buckets que sean necesarios.
+// El boilerplate va a crear un bucket para dev y otro para prod, usando el nombre del bucket con -dev o -prod al final.
+const BUCKETS: BucketInput[] = [{ name: 'prevalentware-boilerplate' }];
 
-export { CUSTOMER, PROJECT, ACCOUNT, REGION, APP_NAME };
+export { CUSTOMER, PROJECT, ACCOUNT, REGION, APP_NAME, CIDR_RANGE, BUCKETS };
