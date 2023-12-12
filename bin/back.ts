@@ -2,8 +2,9 @@
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import { BackStack } from '../lib/back-stack';
+import { PipelineStack } from '../lib/pipeline-stack';
 import { ACCOUNT, APP_NAME, REGION, CUSTOMER } from '../config';
-import { Environment } from 'types';
+import { Environment } from '../types';
 
 const app = new cdk.App();
 
@@ -24,3 +25,7 @@ const backStackProd = new BackStack(
   },
   Environment.PROD
 );
+
+const pipelineStack = new PipelineStack(app, `${CUSTOMER}-${APP_NAME}-cicd`, {
+  env: { account: ACCOUNT, region: REGION },
+});

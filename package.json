@@ -9,7 +9,10 @@
     "clean": "yarn rimraf dist",
     "test": "jest",
     "cdk": "cdk",
-    "deploy": "yarn clean && yarn build && yarn cdk deploy",
+    "deploy:all": "yarn clean && yarn build && yarn cdk deploy --all",
+    "deploy:dev":"yarn clean && yarn build && yarn cdk deploy prevalentware-boilerplate-stack-dev",
+    "deploy:prod":"yarn clean && yarn build && yarn cdk deploy prevalentware-boilerplate-stack-prod",
+    "deploy:pipeline":"yarn clean && yarn build && yarn cdk deploy prevalentware-boilerplate-cicd",
     "destroy": "yarn cdk destroy",
     "synth": "yarn cdk synth > template.yaml"
   },

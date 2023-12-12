@@ -1,4 +1,4 @@
-FROM public.ecr.aws/lambda/nodejs:14 as builder
+FROM public.ecr.aws/lambda/nodejs:18 as builder
 WORKDIR /usr/app
 COPY package.json ./
 RUN npm install
@@ -9,7 +9,7 @@ RUN npx prisma generate
 COPY ./src ./
 RUN npm run build
 
-FROM public.ecr.aws/lambda/nodejs:14
+FROM public.ecr.aws/lambda/nodejs:18
 WORKDIR ${LAMBDA_TASK_ROOT}
 COPY --from=builder /usr/app/package.json ./
 COPY --from=builder /usr/app/dist/* ./

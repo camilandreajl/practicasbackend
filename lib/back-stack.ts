@@ -10,7 +10,7 @@ import * as iam from 'aws-cdk-lib/aws-iam';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as secretsManager from 'aws-cdk-lib/aws-secretsmanager';
 import { BUCKETS, CIDR_RANGE, CUSTOMER, PROJECT } from '../config';
-import { BucketInput, Environment } from 'types';
+import { BucketInput, Environment } from '../types';
 
 export class BackStack extends Stack {
   deployEnvironment: Environment;
