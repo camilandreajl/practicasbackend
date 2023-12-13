@@ -129,7 +129,7 @@ export class PipelineStack extends cdk.Stack {
               ],
             },
             build: {
-              commmands: [
+              commands: [
                 'echo Desplegando el aplicativo...',
                 `yarn deploy:${env === Environment.PROD ? 'prod' : 'dev'}`,
               ],
