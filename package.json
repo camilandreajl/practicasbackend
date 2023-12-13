@@ -10,8 +10,8 @@
     "test": "jest",
     "cdk": "cdk",
     "deploy:all": "yarn clean && yarn build && yarn cdk deploy --all",
-    "deploy:dev":"yarn clean && yarn build && yarn cdk deploy prevalentware-boilerplate-stack-dev",
-    "deploy:prod":"yarn clean && yarn build && yarn cdk deploy prevalentware-boilerplate-stack-prod",
+    "deploy:dev":"yarn clean && yarn build && yarn cdk deploy prevalentware-boilerplate-stack-dev --require-approval never",
+    "deploy:prod":"yarn clean && yarn build && yarn cdk deploy prevalentware-boilerplate-stack-prod --require-approval never",
     "deploy:pipeline":"yarn clean && yarn build && yarn cdk deploy prevalentware-boilerplate-cicd",
     "destroy": "yarn cdk destroy",
     "synth": "yarn cdk synth > template.yaml"
