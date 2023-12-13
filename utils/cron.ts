@@ -25,6 +25,9 @@ export function buildCron(scheduleType: ScheduleType, hour: number, utcOffset: U
     utcHour -= 24;
   }
 
-  const dayOfWeek = scheduleType === ScheduleType.WEEKDAYS_ONLY ? 'MON-FRI' : '*';
-  return `cron(${utcHour} * * * ${dayOfWeek} *)`;
+  // For EventBridge, use '?' in Day-of-month when Day-of-week is specified, and vice versa
+  const dayOfMonth = scheduleType === ScheduleType.WEEKDAYS_ONLY ? '?' : '*';
+  const dayOfWeek = scheduleType === ScheduleType.WEEKDAYS_ONLY ? 'MON-FRI' : '?';
+
+  return `cron(0 ${utcHour} ${dayOfMonth} * ${dayOfWeek} *)`;
 }
