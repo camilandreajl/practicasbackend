@@ -16,7 +16,7 @@ export class PipelineStack extends cdk.Stack {
     // crear un secrets manager para guardar el token de GitHub
     const secret = this.buildSecretsManager();
 
-    // crear un role para que el pipeline pueda desplegar
+    // // crear un role para que el pipeline pueda desplegar
     const role = this.buildPipelineRole();
 
     // construir el pipeline de DEV
@@ -147,7 +147,7 @@ export class PipelineStack extends cdk.Stack {
 
     const deployStage: cdk.aws_codepipeline.StageProps = {
       stageName: `Deploy-${env}`,
-      actions: [],
+      actions: [deployAction],
     };
 
     // construir el pipeline
