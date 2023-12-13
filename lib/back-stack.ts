@@ -242,7 +242,7 @@ export class BackStack extends Stack {
     const dbManagerLambda = new lambda.Function(this, 'DBManagerLambda', {
       functionName: `${CUSTOMER}-${PROJECT}-lambda-dbmanager-${this.deployEnvironment}`,
       runtime: lambda.Runtime.PYTHON_3_8,
-      code: lambda.Code.fromAsset('../utils/db-manager.py'),
+      code: lambda.Code.fromAsset(path.join(__dirname, '../utils/dbmanager')),
       handler: 'index.handler',
       role: lambdaRole,
       environment: {
