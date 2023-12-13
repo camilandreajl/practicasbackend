@@ -8,9 +8,12 @@ import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as rds from 'aws-cdk-lib/aws-rds';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
+import * as events from 'aws-cdk-lib/aws-events';
+import * as targets from 'aws-cdk-lib/aws-events-targets';
 import * as secretsManager from 'aws-cdk-lib/aws-secretsmanager';
 import { BUCKETS, CIDR_RANGE, CUSTOMER, PROJECT } from '../config';
 import { BucketInput, Environment } from '../types';
+import { ScheduleType, buildCron } from '../utils/cron';
 
 export class BackStack extends Stack {
   deployEnvironment: Environment;
@@ -164,6 +167,20 @@ export class BackStack extends Stack {
       securityGroups: [securityGroup],
     });
 
+    if (this.deployEnvironment === Environment.PROD) {
+      // add a lambda function to turn off or start the database
+      this.buildDBManagerLambda(cluster, null, buildCron(ScheduleType.EVERY_DAY, 18, -5));
+    }
+
+    if (this.deployEnvironment === Environment.DEV) {
+      // add a lambda function to turn off or start the database
+      this.buildDBManagerLambda(
+        cluster,
+        buildCron(ScheduleType.WEEKDAYS_ONLY, 6, -5),
+        buildCron(ScheduleType.EVERY_DAY, 18, -5)
+      );
+    }
+
     this.addCustomerTags(cluster);
     return cluster;
   }
@@ -197,5 +214,65 @@ export class BackStack extends Stack {
     });
     this.addCustomerTags(s3Bucket);
     return s3Bucket;
+  }
+
+  buildDBManagerLambda(
+    rdsInstance: rds.DatabaseInstance,
+    startSchedule?: string | null,
+    stopSchedule?: string | null
+  ): void {
+    // Define the IAM role for the Lambda function
+    const lambdaRole = new iam.Role(this, 'LambdaExecutionRole', {
+      roleName: `${CUSTOMER}-${PROJECT}-lambda-dbmanager-role-${this.deployEnvironment}`,
+      assumedBy: new iam.ServicePrincipal('lambda.amazonaws.com'),
+      managedPolicies: [
+        iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaBasicExecutionRole'),
+      ],
+    });
+
+    // Add permissions to the role to manage the RDS instance
+    lambdaRole.addToPolicy(
+      new iam.PolicyStatement({
+        actions: ['rds:StartDBInstance', 'rds:StopDBInstance'],
+        resources: [rdsInstance.instanceArn],
+      })
+    );
+
+    // Define the Lambda function
+    const dbManagerLambda = new lambda.Function(this, 'DBManagerLambda', {
+      functionName: `${CUSTOMER}-${PROJECT}-lambda-dbmanager-${this.deployEnvironment}`,
+      runtime: lambda.Runtime.PYTHON_3_8,
+      code: lambda.Code.fromAsset('../utils/db-manager.py'),
+      handler: 'index.handler',
+      role: lambdaRole,
+      environment: {
+        DB_INSTANCE_IDENTIFIER: rdsInstance.instanceIdentifier,
+      },
+    });
+
+    // Add EventBridge triggers based on provided schedules
+    if (startSchedule) {
+      new events.Rule(this, 'StartDBRule', {
+        ruleName: `${CUSTOMER}-${PROJECT}-lambda-dbmanager-start-${this.deployEnvironment}`,
+        schedule: events.Schedule.expression(startSchedule),
+        targets: [
+          new targets.LambdaFunction(dbManagerLambda, {
+            event: events.RuleTargetInput.fromObject({ action: 'start' }),
+          }),
+        ],
+      });
+    }
+
+    if (stopSchedule) {
+      new events.Rule(this, 'StopDBRule', {
+        ruleName: `${CUSTOMER}-${PROJECT}-lambda-dbmanager-stop-${this.deployEnvironment}`,
+        schedule: events.Schedule.expression(stopSchedule),
+        targets: [
+          new targets.LambdaFunction(dbManagerLambda, {
+            event: events.RuleTargetInput.fromObject({ action: 'stop' }),
+          }),
+        ],
+      });
+    }
   }
 }
