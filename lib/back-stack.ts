@@ -176,7 +176,8 @@ export class BackStack extends Stack {
       // add a lambda function to turn off or start the database
       this.buildDBManagerLambda(
         cluster,
-        buildCron(ScheduleType.WEEKDAYS_ONLY, 6, -5),
+        // buildCron(ScheduleType.WEEKDAYS_ONLY, 6, -5),
+        null,
         buildCron(ScheduleType.EVERY_DAY, 18, -5)
       );
     }
