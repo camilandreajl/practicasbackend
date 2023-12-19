@@ -244,7 +244,7 @@ export class BackStack extends Stack {
       functionName: `${CUSTOMER}-${PROJECT}-lambda-dbmanager-${this.deployEnvironment}`,
       runtime: lambda.Runtime.PYTHON_3_8,
       code: lambda.Code.fromAsset(path.join(__dirname, '../utils/dbmanager')),
-      handler: 'index.handler',
+      handler: 'main.handler',
       role: lambdaRole,
       environment: {
         DB_INSTANCE_IDENTIFIER: rdsInstance.instanceIdentifier,
