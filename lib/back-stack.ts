@@ -169,17 +169,18 @@ export class BackStack extends Stack {
 
     if (this.deployEnvironment === Environment.PROD) {
       // add a lambda function to turn off or start the database
-      this.buildDBManagerLambda(cluster, null, buildCron(ScheduleType.EVERY_DAY, 18, -5));
+      this.buildDBManagerLambda(cluster, {
+        startSchedule: null,
+        stopSchedule: buildCron(ScheduleType.EVERY_DAY, 18, -5),
+      });
     }
 
     if (this.deployEnvironment === Environment.DEV) {
       // add a lambda function to turn off or start the database
-      this.buildDBManagerLambda(
-        cluster,
-        // buildCron(ScheduleType.WEEKDAYS_ONLY, 6, -5),
-        null,
-        buildCron(ScheduleType.EVERY_DAY, 18, -5)
-      );
+      this.buildDBManagerLambda(cluster, {
+        startSchedule: null, // buildCron(ScheduleType.EVERY_DAY, 6, -5),
+        stopSchedule: buildCron(ScheduleType.EVERY_DAY, 18, -5),
+      });
     }
 
     this.addCustomerTags(cluster);
@@ -219,8 +220,13 @@ export class BackStack extends Stack {
 
   buildDBManagerLambda(
     rdsInstance: rds.DatabaseInstance,
-    startSchedule?: string | null,
-    stopSchedule?: string | null
+    {
+      startSchedule,
+      stopSchedule,
+    }: {
+      startSchedule?: string | null;
+      stopSchedule?: string | null;
+    }
   ): void {
     // Define the IAM role for the Lambda function
     const lambdaRole = new iam.Role(this, 'LambdaExecutionRole', {
