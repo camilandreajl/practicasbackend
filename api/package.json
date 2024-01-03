@@ -4,7 +4,6 @@
   "main": "index.js",
   "license": "MIT",
   "exports": "./dist/index.js",
- 
   "scripts": {
     "generate_build": "cosmo && npx prisma generate && prettier --config .prettierrc prisma/generated/graphql/**/*.ts --write && next build",
     "cosmo": "cosmo && prettier --config .prettierrc prisma/generated/graphql/**/*.ts --write",
@@ -15,9 +14,9 @@
     "build": "esbuild index.ts --bundle --minify --sourcemap --platform=node --target=es2020 --outfile=dist/index.js",
     "start": "ts-node index.ts"
   },
-
   "dependencies": {
     "@as-integrations/aws-lambda": "^2.0.1",
+    "@aws-sdk/client-secrets-manager": "^3.477.0",
     "@prisma/client": "^4.9.0",
     "aws-sdk": "^2.1237.0",
     "dataloader": "^2.2.2",
