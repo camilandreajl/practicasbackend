@@ -133,7 +133,7 @@ export class BackStack extends Stack {
           username: 'postgres', // cambiarlo si es necesario dependiendo del cliente.
         }),
         generateStringKey: 'password',
-        excludeCharacters: '"@/\\-#{[()]};:=`',
+        excludeCharacters: '"@/\\-#{[()]};:=`,.\'<>!$%^&*()+~|?',
       },
     });
     this.addCustomerTags(databaseSecret);
