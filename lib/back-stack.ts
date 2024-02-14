@@ -45,7 +45,7 @@ export class BackStack extends Stack {
     const secret = cluster.secret;
     //ecs fargate for gateway
     const { cluster: ecsCluster, fargateTaskDefinition } = this.buildECSCluster(
-      "../microservices/gateway",
+      "../api",
       secret,
       vpc
     );
