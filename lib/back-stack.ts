@@ -43,17 +43,17 @@ export class BackStack extends Stack {
     const lambda = this.buildServerLambda(cluster);
     const api = this.buildApiGateway(lambda);
     const secret = cluster.secret;
-    //ecs fargate for gateway
-    const { cluster: ecsCluster, fargateTaskDefinition } = this.buildECSCluster(
-      "../api",
-      secret,
-      vpc
-    );
-    const ecsService = this.buildECSFargateService(
-      ecsCluster,
-      fargateTaskDefinition,
-      vpc
-    );
+    //Se genera server de fargate cuando el entorno sea produccion
+    // if (this.deployEnvironment === Environment.PROD) {
+    //   //ecs fargate for gateway
+    //   const { cluster: ecsCluster, fargateTaskDefinition } =
+    //     this.buildECSCluster("../api", secret, vpc);
+    //   const ecsService = this.buildECSFargateService(
+    //     ecsCluster,
+    //     fargateTaskDefinition,
+    //     vpc
+    //   );
+    // }
 
     BUCKETS.forEach((bucket) =>
       this.buildS3({
