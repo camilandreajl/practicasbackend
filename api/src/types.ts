@@ -1,5 +1,5 @@
-import { Prisma, PrismaClient, Role, Session, User } from "@prisma/client";
-import type { APIGatewayProxyEvent } from "aws-lambda";
+import { Prisma, PrismaClient, Role, Session, User } from '@prisma/client';
+import type { APIGatewayProxyEvent } from 'aws-lambda';
 
 type db = PrismaClient<
   Prisma.PrismaClientOptions,
@@ -21,12 +21,13 @@ interface Context {
   db: db;
   // sessionToken: string | undefined;
   // user: (User & { role: Role | null }) | undefined;
-  session:| (Session & {
-    user: User & {
-      role: Role | null;
-    };
-  })
-  | null;
+  session:
+    | (Session & {
+        user: User & {
+          role: Role | null;
+        };
+      })
+    | null;
 }
 
 interface ResolverFunction {
