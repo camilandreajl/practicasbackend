@@ -1,18 +1,13 @@
-import { ApolloServer } from "@apollo/server";
-import {
-  startServerAndCreateLambdaHandler,
-  handlers,
-} from "@as-integrations/aws-lambda";
-import { readFileSync } from "fs";
-import { getDB } from "./db";
-import { getSession } from "./auth/getSession";
+import { ApolloServer } from '@apollo/server';
+import { startServerAndCreateLambdaHandler, handlers } from '@as-integrations/aws-lambda';
+import { readFileSync } from 'fs';
+import { getDB } from './db';
+import { getSession } from './auth/getSession';
 
-import resolverArray from "./models";
-import { middlewareFunctions } from "./middleware";
+import resolverArray from './models';
+import { middlewareFunctions } from './middleware';
 
-const typeDefs = readFileSync(
-  require.resolve("./graphql/schema.graphql")
-).toString("utf-8");
+const typeDefs = readFileSync(require.resolve('./graphql/schema.graphql')).toString('utf-8');
 
 const AWSTypes = `
 scalar AWSDateTime
@@ -26,18 +21,13 @@ const server = new ApolloServer({
 });
 
 const apiGatewayHandler = handlers.createAPIGatewayProxyEventRequestHandler();
-export const handler = startServerAndCreateLambdaHandler(
-  server,
-  apiGatewayHandler,
-  {
-    context: async ({ event }) => {
-      
-      event.body;
-      const db = await getDB();
-      const sessionToken: string | undefined = event.headers["next-auth.session-token"];
-      const session = await getSession(db, sessionToken)
-      return { db, session};
-    },
-    middleware: middlewareFunctions,
-  }
-);
+export const handler = startServerAndCreateLambdaHandler(server, apiGatewayHandler, {
+  context: async ({ event }) => {
+    event.body;
+    const db = await getDB();
+    const sessionToken: string | undefined = event.headers['next-auth.session-token'];
+    const session = await getSession(db, sessionToken);
+    return { db, session };
+  },
+  middleware: middlewareFunctions,
+});

@@ -1,38 +1,26 @@
-import {
-  Duration,
-  Expiration,
-  RemovalPolicy,
-  Stack,
-  StackProps,
-  Tags,
-} from "aws-cdk-lib";
-import { Construct } from "constructs";
-import * as apiGateway from "aws-cdk-lib/aws-apigateway";
-import * as cdk from "aws-cdk-lib";
-import * as path from "path";
-import * as lambda from "aws-cdk-lib/aws-lambda";
-import * as s3 from "aws-cdk-lib/aws-s3";
-import * as rds from "aws-cdk-lib/aws-rds";
-import * as iam from "aws-cdk-lib/aws-iam";
-import * as elbv2 from "aws-cdk-lib/aws-elasticloadbalancingv2";
-import * as ecs from "aws-cdk-lib/aws-ecs";
-import * as ecsPatterns from "aws-cdk-lib/aws-ecs-patterns";
-import * as ec2 from "aws-cdk-lib/aws-ec2";
-import * as events from "aws-cdk-lib/aws-events";
-import * as targets from "aws-cdk-lib/aws-events-targets";
-import * as secretsManager from "aws-cdk-lib/aws-secretsmanager";
-import { BUCKETS, CIDR_RANGE, CUSTOMER, PROJECT } from "../config";
-import { BucketInput, Environment } from "../types";
-import { ScheduleType, buildCron } from "../utils/cron";
+import { Duration, Expiration, RemovalPolicy, Stack, StackProps, Tags } from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import * as apiGateway from 'aws-cdk-lib/aws-apigateway';
+import * as cdk from 'aws-cdk-lib';
+import * as path from 'path';
+import * as lambda from 'aws-cdk-lib/aws-lambda';
+import * as s3 from 'aws-cdk-lib/aws-s3';
+import * as rds from 'aws-cdk-lib/aws-rds';
+import * as iam from 'aws-cdk-lib/aws-iam';
+import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
+import * as ecs from 'aws-cdk-lib/aws-ecs';
+import * as ecsPatterns from 'aws-cdk-lib/aws-ecs-patterns';
+import * as ec2 from 'aws-cdk-lib/aws-ec2';
+import * as events from 'aws-cdk-lib/aws-events';
+import * as targets from 'aws-cdk-lib/aws-events-targets';
+import * as secretsManager from 'aws-cdk-lib/aws-secretsmanager';
+import { BUCKETS, CIDR_RANGE, CUSTOMER, PROJECT } from '../config';
+import { BucketInput, Environment } from '../types';
+import { ScheduleType, buildCron } from '../utils/cron';
 
 export class BackStack extends Stack {
   deployEnvironment: Environment;
-  constructor(
-    scope: Construct,
-    id: string,
-    props?: StackProps,
-    env?: Environment | undefined
-  ) {
+  constructor(scope: Construct, id: string, props?: StackProps, env?: Environment | undefined) {
     super(scope, id, props);
 
     this.deployEnvironment = env || Environment.DEV;
@@ -64,8 +52,8 @@ export class BackStack extends Stack {
   }
 
   addCustomerTags = (scope: Construct) => {
-    Tags.of(scope).add("customer", CUSTOMER);
-    Tags.of(scope).add("type", "customer");
+    Tags.of(scope).add('customer', CUSTOMER);
+    Tags.of(scope).add('type', 'customer');
   };
 
   buildVPC() {
@@ -78,14 +66,14 @@ export class BackStack extends Stack {
       subnetConfiguration: [
         {
           subnetType: ec2.SubnetType.PUBLIC,
-          name: "Public",
+          name: 'Public',
           cidrMask: 24,
           // Enable auto-assign public IPv4 address
           mapPublicIpOnLaunch: true,
         },
         {
           subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
-          name: "Private",
+          name: 'Private',
           cidrMask: 24,
         },
       ],
@@ -98,7 +86,7 @@ export class BackStack extends Stack {
     const securityGroup = new ec2.SecurityGroup(this, identifier, {
       securityGroupName: identifier,
       vpc,
-      description: "Allow postgres access",
+      description: 'Allow postgres access',
       allowAllOutbound: true, // set to false if you want to control outbound traffic
     });
 
@@ -118,10 +106,7 @@ export class BackStack extends Stack {
       defaultCorsPreflightOptions: {
         allowOrigins: apiGateway.Cors.ALL_ORIGINS,
         allowMethods: apiGateway.Cors.ALL_METHODS,
-        allowHeaders: [
-          ...apiGateway.Cors.DEFAULT_HEADERS,
-          "next-auth.session-token",
-        ],
+        allowHeaders: [...apiGateway.Cors.DEFAULT_HEADERS, 'next-auth.session-token'],
       },
     });
     this.addCustomerTags(apiGw);
@@ -131,15 +116,15 @@ export class BackStack extends Stack {
   buildServerLambda(cluster?: rds.DatabaseInstance) {
     // Lambda resolver
     const identifier = `${CUSTOMER}-${PROJECT}-server-${this.deployEnvironment}`;
-    const dockerfile = path.join(__dirname, "../api");
+    const dockerfile = path.join(__dirname, '../api');
     const dockerLambda = new lambda.DockerImageFunction(this, identifier, {
       functionName: identifier,
       code: lambda.DockerImageCode.fromImageAsset(dockerfile),
       memorySize: 1024,
       timeout: Duration.seconds(60),
       environment: {
-        SECRET_ID: cluster?.secret?.secretArn || "",
-        AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1",
+        SECRET_ID: cluster?.secret?.secretArn || '',
+        AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
       },
     });
     this.addCustomerTags(dockerLambda);
@@ -148,8 +133,8 @@ export class BackStack extends Stack {
       dockerLambda.addToRolePolicy(
         new iam.PolicyStatement({
           effect: iam.Effect.ALLOW,
-          actions: ["secretsmanager:GetSecretValue"],
-          resources: [cluster.secret?.secretArn || ""],
+          actions: ['secretsmanager:GetSecretValue'],
+          resources: [cluster.secret?.secretArn || ''],
         })
       );
     }
@@ -163,19 +148,17 @@ export class BackStack extends Stack {
       secretName: secretIdentifier,
       generateSecretString: {
         secretStringTemplate: JSON.stringify({
-          username: "postgres", // cambiarlo si es necesario dependiendo del cliente.
+          username: 'postgres', // cambiarlo si es necesario dependiendo del cliente.
         }),
-        generateStringKey: "password",
-        excludeCharacters: "\"@/\\-#{[()]};:=`,.'<>!$%^&*()+~|?",
+        generateStringKey: 'password',
+        excludeCharacters: '"@/\\-#{[()]};:=`,.\'<>!$%^&*()+~|?',
       },
     });
     this.addCustomerTags(databaseSecret);
     // postgres rds database
 
-    const project = PROJECT.toLowerCase().replace(/-/g, "_");
-    const identifier = `${CUSTOMER.toLowerCase()}-${project}-db-${
-      this.deployEnvironment
-    }`;
+    const project = PROJECT.toLowerCase().replace(/-/g, '_');
+    const identifier = `${CUSTOMER.toLowerCase()}-${project}-db-${this.deployEnvironment}`;
 
     const cluster = new rds.DatabaseInstance(this, identifier, {
       engine: rds.DatabaseInstanceEngine.postgres({
@@ -234,8 +217,8 @@ export class BackStack extends Stack {
       cors: [
         {
           allowedMethods: [s3.HttpMethods.GET],
-          allowedOrigins: ["*"],
-          allowedHeaders: ["*"],
+          allowedOrigins: ['*'],
+          allowedHeaders: ['*'],
         },
       ],
       ...(isPublic
@@ -264,30 +247,28 @@ export class BackStack extends Stack {
     }
   ): void {
     // Define the IAM role for the Lambda function
-    const lambdaRole = new iam.Role(this, "LambdaExecutionRole", {
+    const lambdaRole = new iam.Role(this, 'LambdaExecutionRole', {
       roleName: `${CUSTOMER}-${PROJECT}-lambda-dbmanager-role-${this.deployEnvironment}`,
-      assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com"),
+      assumedBy: new iam.ServicePrincipal('lambda.amazonaws.com'),
       managedPolicies: [
-        iam.ManagedPolicy.fromAwsManagedPolicyName(
-          "service-role/AWSLambdaBasicExecutionRole"
-        ),
+        iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaBasicExecutionRole'),
       ],
     });
 
     // Add permissions to the role to manage the RDS instance
     lambdaRole.addToPolicy(
       new iam.PolicyStatement({
-        actions: ["rds:StartDBInstance", "rds:StopDBInstance"],
+        actions: ['rds:StartDBInstance', 'rds:StopDBInstance'],
         resources: [rdsInstance.instanceArn],
       })
     );
 
     // Define the Lambda function
-    const dbManagerLambda = new lambda.Function(this, "DBManagerLambda", {
+    const dbManagerLambda = new lambda.Function(this, 'DBManagerLambda', {
       functionName: `${CUSTOMER}-${PROJECT}-lambda-dbmanager-${this.deployEnvironment}`,
       runtime: lambda.Runtime.PYTHON_3_8,
-      code: lambda.Code.fromAsset(path.join(__dirname, "../utils/dbmanager")),
-      handler: "main.handler",
+      code: lambda.Code.fromAsset(path.join(__dirname, '../utils/dbmanager')),
+      handler: 'main.handler',
       role: lambdaRole,
       environment: {
         DB_INSTANCE_IDENTIFIER: rdsInstance.instanceIdentifier,
@@ -296,24 +277,24 @@ export class BackStack extends Stack {
 
     // Add EventBridge triggers based on provided schedules
     if (startSchedule) {
-      new events.Rule(this, "StartDBRule", {
+      new events.Rule(this, 'StartDBRule', {
         ruleName: `${CUSTOMER}-${PROJECT}-lambda-dbmanager-start-${this.deployEnvironment}`,
         schedule: events.Schedule.expression(startSchedule),
         targets: [
           new targets.LambdaFunction(dbManagerLambda, {
-            event: events.RuleTargetInput.fromObject({ action: "start" }),
+            event: events.RuleTargetInput.fromObject({ action: 'start' }),
           }),
         ],
       });
     }
 
     if (stopSchedule) {
-      new events.Rule(this, "StopDBRule", {
+      new events.Rule(this, 'StopDBRule', {
         ruleName: `${CUSTOMER}-${PROJECT}-lambda-dbmanager-stop-${this.deployEnvironment}`,
         schedule: events.Schedule.expression(stopSchedule),
         targets: [
           new targets.LambdaFunction(dbManagerLambda, {
-            event: events.RuleTargetInput.fromObject({ action: "stop" }),
+            event: events.RuleTargetInput.fromObject({ action: 'stop' }),
           }),
         ],
       });
@@ -324,7 +305,7 @@ export class BackStack extends Stack {
     secret: secretsManager.ISecret | undefined,
     vpc: ec2.IVpc
   ) {
-    const cluster = new ecs.Cluster(this, "ECSCluster", {
+    const cluster = new ecs.Cluster(this, 'ECSCluster', {
       vpc: vpc,
       clusterName: `${CUSTOMER}-${PROJECT}-cluster`,
       containerInsights: true,
@@ -332,22 +313,18 @@ export class BackStack extends Stack {
     this.addCustomerTags(cluster);
 
     // fargate task definition
-    const fargateTaskDefinition = new ecs.FargateTaskDefinition(
-      this,
-      "ApiTaskDefinition",
-      {
-        memoryLimitMiB: 2048,
-        cpu: 1024,
-      }
-    );
+    const fargateTaskDefinition = new ecs.FargateTaskDefinition(this, 'ApiTaskDefinition', {
+      memoryLimitMiB: 2048,
+      cpu: 1024,
+    });
     this.addCustomerTags(fargateTaskDefinition);
 
     const Dockerfile = path.join(__dirname, dockerFilePath);
 
-    const container = fargateTaskDefinition.addContainer("TaskContainer", {
+    const container = fargateTaskDefinition.addContainer('TaskContainer', {
       // Use an image from Amazon ECR
       image: ecs.ContainerImage.fromAsset(Dockerfile, {
-        file: "Dockerfile.fargate",
+        file: 'Dockerfile.fargate',
       }),
       logging: ecs.LogDrivers.awsLogs({
         streamPrefix: `${CUSTOMER}-${PROJECT}-logs`,
@@ -357,15 +334,12 @@ export class BackStack extends Stack {
         { containerPort: 443, hostPort: 443 },
       ],
       environment: {
-        SECRET_ID: secret?.secretName || "",
-        AWS_NODEJS_CONNECTION_REUSE_ENABLED: "1",
-        TEST: "false",
+        SECRET_ID: secret?.secretName || '',
+        AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
+        TEST: 'false',
       },
       healthCheck: {
-        command: [
-          "CMD-SHELL",
-          "curl -f http://localhost:80/healthcheck || exit 1",
-        ],
+        command: ['CMD-SHELL', 'curl -f http://localhost:80/healthcheck || exit 1'],
         interval: Duration.minutes(1),
         timeout: Duration.seconds(5),
         retries: 3,
@@ -376,7 +350,7 @@ export class BackStack extends Stack {
     if (secret) {
       // Create an IAM policy statement that allows access to the secret
       const secretAccessPolicy = new iam.PolicyStatement({
-        actions: ["secretsmanager:GetSecretValue"],
+        actions: ['secretsmanager:GetSecretValue'],
         resources: [secret.secretArn], // Ensure that `secret` is the AWS Secrets Manager secret object
         effect: iam.Effect.ALLOW,
       });
@@ -395,31 +369,27 @@ export class BackStack extends Stack {
     vpc: ec2.IVpc,
     desiredCount: number = 2
   ) {
-    const service = new ecsPatterns.ApplicationLoadBalancedFargateService(
-      this,
-      "FargateService",
-      {
-        cluster: cluster, // Required
-        desiredCount, // Default is 1
-        taskDefinition: taskDefinition, // Required
-        cpu: 512, // Default is 256
-        memoryLimitMiB: 2048, // Default is 512
-        publicLoadBalancer: true, // Default is true
-        loadBalancerName: `${PROJECT}-lb`,
-        healthCheckGracePeriod: Duration.minutes(1),
-        propagateTags: ecs.PropagatedTagSource.TASK_DEFINITION,
-        minHealthyPercent: 0,
-        maxHealthyPercent: 400,
-      }
-    );
+    const service = new ecsPatterns.ApplicationLoadBalancedFargateService(this, 'FargateService', {
+      cluster: cluster, // Required
+      desiredCount, // Default is 1
+      taskDefinition: taskDefinition, // Required
+      cpu: 512, // Default is 256
+      memoryLimitMiB: 2048, // Default is 512
+      publicLoadBalancer: true, // Default is true
+      loadBalancerName: `${PROJECT}-lb`,
+      healthCheckGracePeriod: Duration.minutes(1),
+      propagateTags: ecs.PropagatedTagSource.TASK_DEFINITION,
+      minHealthyPercent: 0,
+      maxHealthyPercent: 400,
+    });
 
     service.targetGroup.configureHealthCheck({
-      port: "80",
+      port: '80',
       protocol: elbv2.Protocol.HTTP,
       enabled: true,
       healthyThresholdCount: 2,
       unhealthyThresholdCount: 2,
-      path: "/healthcheck",
+      path: '/healthcheck',
       interval: Duration.minutes(3),
       timeout: Duration.minutes(1),
     });
@@ -429,17 +399,13 @@ export class BackStack extends Stack {
       vpc,
       securityGroupName: `${CUSTOMER}-HTTPS-SecurityGroup`,
     });
-    sg.addIngressRule(
-      ec2.Peer.anyIpv4(),
-      ec2.Port.tcp(443),
-      "Allow HTTPS traffic from anywhere"
-    );
+    sg.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(443), 'Allow HTTPS traffic from anywhere');
     lb.addSecurityGroup(sg);
 
     const certificateArn =
-      "arn:aws:acm:us-east-1:957462150790:certificate/dd869319-e2bd-4298-b695-1291210cfe95";
+      'arn:aws:acm:us-east-1:957462150790:certificate/dd869319-e2bd-4298-b695-1291210cfe95';
 
-    const httpsListener = lb.addListener("MyHttpsListener", {
+    const httpsListener = lb.addListener('MyHttpsListener', {
       port: 443,
       certificates: [elbv2.ListenerCertificate.fromArn(certificateArn)],
       open: true,

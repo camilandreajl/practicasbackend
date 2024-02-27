@@ -5,7 +5,6 @@
 // import { getDB,  } from '../db';
 // import { resolve } from 'path';
 
-
 // const sessionMiddleware: middleware.MiddlewareFn<
 //   handlers.RequestHandler<APIGatewayProxyEvent, APIGatewayProxyStructuredResultV2>
 // > = async (event) => {
@@ -25,7 +24,7 @@
 //         },
 //       }
 //     },
-//   });   
+//   });
 //   // event.headers = {...event.headers,   session:session}
 //   }
 //   const session: middleware.MiddlewareFn<
@@ -47,11 +46,10 @@
 //         },
 //       }
 //     },
-//   }); 
-//   return session  
+//   });
+//   return session
 //   // event.headers = {...event.headers,   session:session}
 //   }
-
 
 //   // if (!session && method === 'POST') {
 //   //   result.body = JSON.stringify({ error: 'Invalid session token' });
@@ -61,7 +59,6 @@
 //   //   result.body = JSON.stringify({ error: 'Session expired' });
 //   //   return;
 //   // }
-
 
 //   // const session: any = await db.session.findUnique({
 //   //   where: { sessionToken: sessionToken ?? '' },
@@ -76,23 +73,17 @@
 //   //       },
 //   //     }
 //   //   },
-//   // });   
-  
+//   // });
 
- 
-
-   
 //     // TODO - check if session is expired
 //     // if (session?.expires < new Date()) {
 //     //   result.body = JSON.stringify({ error: 'Session expired' });
 //     //   return;
 //     // }
 
-
 // export { sessionMiddleware, session  };
 import type { APIGatewayProxyEvent, APIGatewayProxyStructuredResultV2 } from 'aws-lambda';
 import { handlers, middleware } from '@as-integrations/aws-lambda';
-
 
 const sessionMiddleware: middleware.MiddlewareFn<
   handlers.RequestHandler<APIGatewayProxyEvent, APIGatewayProxyStructuredResultV2>
@@ -100,23 +91,15 @@ const sessionMiddleware: middleware.MiddlewareFn<
   // const sessionToken = event.headers['next-auth.session-token'] ?? null;
   const method = event['httpMethod'];
 
+  // TODO - check if session is expired
 
- 
+  // if (session?.expires < new Date()) {
 
-    // TODO - check if session is expired
+  //   result.body = JSON.stringify({ error: 'Session expired' });
 
-    // if (session?.expires < new Date()) {
+  //   return;
 
-    //   result.body = JSON.stringify({ error: 'Session expired' });
-
-    //   return;
-
-    // }
-
-  
-
+  // }
 };
-
-
 
 export { sessionMiddleware };

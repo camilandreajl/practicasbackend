@@ -8,7 +8,7 @@ import bodyParser from 'body-parser';
 import { readFileSync } from 'fs';
 import { getDB } from './src/db';
 import { makeExecutableSchema } from '@graphql-tools/schema';
-import { getSession } from "./src/auth/getSession";
+import { getSession } from './src/auth/getSession';
 import resolverArray from './src/models';
 
 // Required logic for integrating with Express

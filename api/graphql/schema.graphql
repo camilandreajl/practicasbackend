@@ -132,25 +132,13 @@ input RoleUpdateInput {
 type Mutation {
   # Account
   createAccount(data: AccountCreateInput): Account
-  updateAccount(
-    where: AccountWhereUniqueInput!
-    data: AccountUpdateInput
-  ): Account
-  upsertAccount(
-    where: AccountWhereUniqueInput!
-    data: AccountCreateInput
-  ): Account
+  updateAccount(where: AccountWhereUniqueInput!, data: AccountUpdateInput): Account
+  upsertAccount(where: AccountWhereUniqueInput!, data: AccountCreateInput): Account
   deleteAccount(where: AccountWhereUniqueInput!): Account
   # Session
   createSession(data: SessionCreateInput): Session
-  updateSession(
-    where: SessionWhereUniqueInput!
-    data: SessionUpdateInput
-  ): Session
-  upsertSession(
-    where: SessionWhereUniqueInput!
-    data: SessionCreateInput
-  ): Session
+  updateSession(where: SessionWhereUniqueInput!, data: SessionUpdateInput): Session
+  upsertSession(where: SessionWhereUniqueInput!, data: SessionCreateInput): Session
   deleteSession(where: SessionWhereUniqueInput!): Session
   # User
   createUser(data: UserCreateInput): User
