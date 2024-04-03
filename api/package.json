@@ -4,6 +4,10 @@
   "main": "index.js",
   "license": "MIT",
   "exports": "./dist/index.js",
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
+
   "scripts": {
     "generate_build": "cosmo && npx prisma generate && prettier --config .prettierrc prisma/generated/graphql/**/*.ts --write && next build",
     "cosmo": "cosmo && prettier --config .prettierrc prisma/generated/graphql/**/*.ts --write",
