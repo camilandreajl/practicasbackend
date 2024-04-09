@@ -17,13 +17,13 @@ export class PipelineStack extends cdk.Stack {
     const secret = this.buildSecretsManager();
 
     // // crear un role para que el pipeline pueda desplegar
-    const role = this.buildPipelineRole();
+    // const role = this.buildPipelineRole();
 
-    // construir el pipeline de DEV
-    this.buildPipeline(role, secret, Environment.DEV);
+    // // construir el pipeline de DEV
+    // this.buildPipeline(role, secret, Environment.DEV);
 
-    // construir el pipeline de PROD
-    this.buildPipeline(role, secret, Environment.PROD);
+    // // construir el pipeline de PROD
+    // this.buildPipeline(role, secret, Environment.PROD);
   }
 
   buildSecretsManager() {
