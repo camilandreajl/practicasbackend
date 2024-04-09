@@ -27,9 +27,7 @@ export const sessionConfig = {
      { name: 'updateRole', roles: ['Admin'], isPublic: false },
      { name: 'upsertRole', roles: ['Admin'], isPublic: false },
      { name: 'deleteRole', roles: ['Admin'], isPublic: false },
-     
-
-   ],
+    ],
  
    Query: [
      // Account
@@ -46,4 +44,4 @@ export const sessionConfig = {
      { name: 'role', roles: ['Admin'], isPublic: false },
    ],
  };
- 
+

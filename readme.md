@@ -1,33 +1,50 @@
-# Backend boilerplate
+# AWS CDK Backend Boilerplate
+## Overview
+This boilerplate project serves as a foundational template for backend development, leveraging AWS Cloud Development Kit (CDK) for infrastructure deployment. It's designed to streamline the setup of AWS services and CI/CD pipelines, providing a robust starting point for new backend projects.
 
-## Deployable to AppSync
+## Features
+AWS Service Deployment: Automated deployment scripts for key AWS services:
 
-## Instructions:
+- Amazon RDS
+- Amazon S3
+- AWS Lambda with Docker container support
+- Amazon API Gateway
+- Secrets Manager
+- VPC
+- Security Groups
+- CI/CD Pipelines: Two GitHub-connected pipelines for seamless deployment:
 
-1. aws configure con las credenciales de la cuenta de aws donde se quiera desplegar el backend
-2. modificar en config.ts.ts el nombre de la app, nombre del cliente, el id de la cuenta y la región
-3. ejecuta el comando `yarn install` para descargar las librerias del cdk y demas dependencias 
-4. agregar schema de prisma en /api/prisma
-5. configurar el string de conexión a la BD en el archivo api/src/db.ts
-6. clonar repositorio de cosmo https://github.com/prevalentWare/prisma-cosmo.git
-7. ejecutar el comando `yarn install` de cosmo
-8. copiar esquema prisma en cosmo y ejecutar con el comando `yarn aws_cosmo`
-9. reemplaza el schema gql, src/models y auth/sessionconfig de la aplicacion backend con los archivos generados   por cosmo.
+    - Development pipeline linked to the dev branch
+    - Production pipeline linked to the main branch
+    - Both pipelines trigger on push events, ensuring consistent infrastructure across environments with size variations (e.g., RDS instance sizes differ between environments).
+    - Cost-Optimized RDS Management: Specialized Lambda functions to schedule RDS clusters' on/off times, optimizing costs.
 
+- Flexible API Development: An api directory for backend development, adaptable to any programming language compatible with Lambda's Docker base image.
 
-## Commands
+## Getting Started
+- Prerequisites: 
+    - Ensure you have AWS CLI and AWS CDK installed and configured.
+    - NodeJS 18 at least is required.
+    - A local docker installation.
+    - VSCode is recommended but not required.
+- Clone the Repository: `git clone git@github.com:prevalentWare/web-boiler-back-lambda.git`.
+- Install Dependencies: Navigate to the project directory and run `yarn install` (or equivalent for your setup).
+- Customize Configuration: Modify the `config.ts` file to suit your environment and AWS setup.
+    - Add the name of the customer, the app, and the project
+    - Add the CIDR range for the customer
+    - Add the name of the repository in GitHub.
+    - Add the required bucket names.
+- Deploy: Run `yarn deploy --all` to deploy your backend infrastructure locally.
+- Develop: Add your backend code in the api folder, following the guidelines for Lambda-compatible Docker development.
 
-- main repo packages
-  `yarn add @aws-cdk/aws-appsync-alpha aws-cdk-lib aws-sdk constructs source-map-support`
-  `yarn add -D @types/node aws-cdk copyfiles rimraf ts-node typescript`
-- api repo packages
-  `yarn add @prisma/client aws-sdk`
-  `yarn add -D @apollo/server @prevalentware/prisma-cosmo @types/node esbuild fs graphql prisma ts-node typescript`
-- back deployment
-  `cdk bootstrap` (sólo hay que ejecutarlo en el despliegue inicial)
-  `yarn deploy`
-- local testing
-  `cd api`
-  `yarn start`
-- testing del contenedor de Docker
-  `docker container rm -f back && docker build -t back . && docker run -p 9000:8080 --name back -e TEST=true back`
+## Environment Configuration
+- RDS Instance Sizes: Configure in `lib/back-stack.ts` the sizes for RDS in the different environments.
+- S3 Settings: Define bucket names and policies in lib/config/s3-config.ts.
+- Lambda Functions: Customize Docker settings and function triggers in lib/lambda.
+
+## CI/CD Pipeline Setup
+- Connecting GitHub: Set up GitHub repository connections in `lib/pipeline-stack`.
+- Branch Configuration: Specify branch names and pipeline triggers in the pipeline files.
+- Make sure to deploy the secrets manager first and then the rest of the pipeline.
+- After deploying the secret, set up the GitHub token directly in Secrets Manager.
+
