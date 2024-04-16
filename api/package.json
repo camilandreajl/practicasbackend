@@ -13,6 +13,7 @@
     "compile": "rimraf ./dist && tsc",
     "build": "esbuild index.ts --bundle --minify --sourcemap --platform=node --target=es2020 --outfile=dist/index.js",
     "start": "ts-node dev.ts",
+    "migration": "ts-node prisma/runMigration.ts",
     "start:prod": "node dist/index.js"
   },
   "dependencies": {
@@ -33,6 +34,7 @@
     "@types/cors": "2.8.13",
     "@types/node": "^18.11.3",
     "@types/nodemailer": "^6.4.9",
+    "dotenv": "^16.4.5",
     "esbuild": "^0.15.12",
     "fs": "^0.0.1-security",
     "graphql": "^16.6.0",

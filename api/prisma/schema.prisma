@@ -11,6 +11,7 @@ datasource db {
 
 enum Enum_RoleName {
     Admin
+    SuperAdmin
 }
 
 model Account {
