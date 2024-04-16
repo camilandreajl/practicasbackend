@@ -24,7 +24,7 @@ export const getDB = async () => {
     const dbURL = await sm.send(getSecretValueCommand);
 
     const secretString = JSON.parse(dbURL.SecretString || '{}');
-    url = `${secretString.DATABASE_URL ?? ''}?schema=dev`;
+    url = `postgresql://${secretString.username}:${secretString.password}@${secretString.host}:${secretString.port}/${secretString.dbname}?schema=dev`;
   } catch (e) {
     console.log('Error getting secret', e);
   }
