@@ -26,6 +26,6 @@ const backStackProd = new BackStack(
   Environment.PROD
 );
 
-const pipelineStack = new PipelineStack(app, `${CUSTOMER}-${APP_NAME}-cicd`, {
-  env: { account: ACCOUNT, region: REGION },
-});
+// const pipelineStack = new PipelineStack(app, `${CUSTOMER}-${APP_NAME}-cicd`, {
+//   env: { account: ACCOUNT, region: REGION },
+// });

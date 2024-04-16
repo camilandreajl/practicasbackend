@@ -94,7 +94,6 @@ const userResolvers: Resolver = {
           // Get Auth0 token
           const { access_token: accessToken, token_type: tokenType } = await getAuth0Token().then(
             (resToken) => resToken
-            
           );
           // Create user in Auth0
           const userData = await createUserAuth0(auth0Object, accessToken, tokenType).then(
