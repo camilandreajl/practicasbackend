@@ -150,7 +150,7 @@ export class BackStack extends Stack {
         secretStringTemplate: JSON.stringify({
           username: 'postgres', // cambiarlo si es necesario dependiendo del cliente.
         }),
-        
+
         generateStringKey: 'password',
         excludeCharacters: '"@/\\-#{[()]};:=`,.\'<>!$%^&*()+~|?',
       },
@@ -172,7 +172,7 @@ export class BackStack extends Stack {
           : ec2.InstanceSize.MICRO
       ),
       vpc,
-      caCertificate:rds.CaCertificate.RDS_CA_RDS2048_G1,
+      caCertificate: rds.CaCertificate.RDS_CA_RDS2048_G1,
       vpcSubnets: {
         subnetType: ec2.SubnetType.PUBLIC,
       },
@@ -218,7 +218,12 @@ export class BackStack extends Stack {
       encryption: s3.BucketEncryption.S3_MANAGED,
       cors: [
         {
-          allowedMethods: [s3.HttpMethods.GET],
+          allowedMethods: [
+            s3.HttpMethods.GET,
+            s3.HttpMethods.PUT,
+            s3.HttpMethods.POST,
+            s3.HttpMethods.DELETE,
+          ],
           allowedOrigins: ['*'],
           allowedHeaders: ['*'],
         },
