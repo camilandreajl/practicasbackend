@@ -15,7 +15,7 @@ const main = async () => {
 	const { url } = await startStandaloneServer(server, {
 		context: async (e: any) => ({
 			db,
-			session: await getSession(db, '123'),
+			session: await getSession(db, e.req.headers['next-auth.session-token']),
 		}),
 	});
 	console.log(`🚀 Server ready at ${url}`);
