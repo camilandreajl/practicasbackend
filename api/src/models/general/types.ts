@@ -29,4 +29,8 @@ export const generalTypes = gql`
 		asc # Ascending order
 		desc # Descending order
 	}
+
+	type Query {
+		getSignedUrlForPutObject(key: String!): String!
+	}
 `;
