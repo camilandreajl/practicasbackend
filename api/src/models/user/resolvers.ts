@@ -160,12 +160,12 @@ const userResolvers: Resolver = {
 				if (resetPassword?.ticket) {
 					// Obtener información del correo electrónico necesario para el cambio de contraseña
 					const emailInfo = changePassword({
-						email: 'sguzman@prevalentware.com', // Dirección de correo electrónico del usuario (aquí se puede cambiar por el correo del usuario real)
+						email: account?.user?.email, // Dirección de correo electrónico del usuario (aquí se puede cambiar por el correo del usuario real)
 						url: resetPassword?.ticket, // URL del ticket para cambiar la contraseña
 					});
 
 					// Enviar el correo electrónico utilizando una función SendMail (se asume que está definida en otra parte del código)
-					SendMail({ email: 'sguzman@prevalentware.com', ...emailInfo }); // Aquí también se puede cambiar la dirección de correo por el del usuario real
+					SendMail({ email: account?.user?.email, ...emailInfo }); // Aquí también se puede cambiar la dirección de correo por el del usuario real
 				}
 
 				// Devolver un mensaje indicando que el envío del correo fue exitoso

@@ -1,30 +1,24 @@
 import { ApolloServer } from '@apollo/server';
 import { startStandaloneServer } from '@apollo/server/standalone';
-import { readFileSync } from 'fs';
+import { resolverArray, typesArray } from './src/models';
 import { getDB } from './src/db';
-import resolverArray from './src/models/index';
 import { getSession } from './src/auth/getSession';
 
-const typeDefs = readFileSync(require.resolve('./graphql/schema.graphql')).toString('utf-8');
-
-const AWSTypes = `
-scalar AWSDateTime
-scalar AWSJSON
-`;
 
 const main = async () => {
-  const db = await getDB();
-  const server = new ApolloServer({
-    typeDefs: `${AWSTypes} ${typeDefs}`,
-    resolvers: resolverArray,
-  });
-  const { url } = await startStandaloneServer(server, {
-    context: async (e: any) => ({
-      db,
-      session: await getSession(db, e.req.headers['next-auth.session-token']),
-    }),
-  });
-  console.log(`🚀 Server ready at ${url}`);
+	const db = await getDB();
+	const server = new ApolloServer({
+		typeDefs: typesArray,
+		resolvers: resolverArray,
+		introspection: true,
+	});
+	const { url } = await startStandaloneServer(server, {
+		context: async (e: any) => ({
+			db,
+			session: await getSession(db, e.req.headers['next-auth.session-token']),
+		}),
+	});
+	console.log(`🚀 Server ready at ${url}`);
 };
 
 main();
