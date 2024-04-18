@@ -42,6 +42,7 @@ export const userTypes = gql`
 	type Mutation {
 		# User
 		createUser(data: UserCreateInput): User
+		changePassword(userId: String!): User
 		updateUser(where: UserWhereUniqueInput!, data: UserUpdateInput): User
 		upsertUser(where: UserWhereUniqueInput!, data: UserCreateInput): User
 		deleteUser(where: UserWhereUniqueInput!): User
