@@ -129,52 +129,52 @@ const userResolvers: Resolver = {
       }
       return Error(check?.error);
     },
-    changePassword: async (parent, args, { db }) => {
-			try {
-				// Obtener el token de autenticación de Auth0 utilizando una función asincrónica y desestructuración
-				const { access_token: accessToken, token_type: tokenType } = await getAuth0Token().then(
-					(resToken) => resToken
-				);
+    // changePassword: async (parent, args, { db }) => {
+		// 	try {
+		// 		// Obtener el token de autenticación de Auth0 utilizando una función asincrónica y desestructuración
+		// 		const { access_token: accessToken, token_type: tokenType } = await getAuth0Token().then(
+		// 			(resToken) => resToken
+		// 		);
 
-				// Buscar el usuario en la base de datos utilizando el userId proporcionado en los argumentos
-				const account = await db.account.findFirst({
-					where: {
-						userId: args.userId,
-					},
-					include: {
-						user: true,
-					},
-				});
+		// 		// Buscar el usuario en la base de datos utilizando el userId proporcionado en los argumentos
+		// 		const account = await db.account.findFirst({
+		// 			where: {
+		// 				userId: args.userId,
+		// 			},
+		// 			include: {
+		// 				user: true,
+		// 			},
+		// 		});
 
-				// Crear un objeto de datos con el user_id necesario para el reseteo de contraseña
-				const data = {
-					user_id: account?.providerAccountId,
-				};
+		// 		// Crear un objeto de datos con el user_id necesario para el reseteo de contraseña
+		// 		const data = {
+		// 			user_id: account?.providerAccountId,
+		// 		};
 
-				// Llamar a la función para resetear la contraseña en Auth0 usando el token de autenticación
-				const resetPassword = await resetPasswordAuth0(data, accessToken, tokenType).then(
-					(resAuth) => resAuth
-				);
+		// 		// Llamar a la función para resetear la contraseña en Auth0 usando el token de autenticación
+		// 		const resetPassword = await resetPasswordAuth0(data, accessToken, tokenType).then(
+		// 			(resAuth) => resAuth
+		// 		);
 
-				// Si la respuesta del reseteo de contraseña contiene un ticket, enviar un correo electrónico al usuario
-				if (resetPassword?.ticket) {
-					// Obtener información del correo electrónico necesario para el cambio de contraseña
-					const emailInfo = changePassword({
-						email: 'sguzman@prevalentware.com', // Dirección de correo electrónico del usuario (aquí se puede cambiar por el correo del usuario real)
-						url: resetPassword?.ticket, // URL del ticket para cambiar la contraseña
-					});
+		// 		// Si la respuesta del reseteo de contraseña contiene un ticket, enviar un correo electrónico al usuario
+		// 		if (resetPassword?.ticket) {
+		// 			// Obtener información del correo electrónico necesario para el cambio de contraseña
+		// 			const emailInfo = changePassword({
+		// 				email: 'sguzman@prevalentware.com', // Dirección de correo electrónico del usuario (aquí se puede cambiar por el correo del usuario real)
+		// 				url: resetPassword?.ticket, // URL del ticket para cambiar la contraseña
+		// 			});
 
-					// Enviar el correo electrónico utilizando una función SendMail (se asume que está definida en otra parte del código)
-					SendMail({ email: 'sguzman@prevalentware.com', ...emailInfo }); // Aquí también se puede cambiar la dirección de correo por el del usuario real
-				}
+		// 			// Enviar el correo electrónico utilizando una función SendMail (se asume que está definida en otra parte del código)
+		// 			SendMail({ email: 'sguzman@prevalentware.com', ...emailInfo }); // Aquí también se puede cambiar la dirección de correo por el del usuario real
+		// 		}
 
-				// Devolver un mensaje indicando que el envío del correo fue exitoso
-				return account?.user;
-			} catch (error) {
-				// En caso de que ocurra un error durante el proceso, devolver un objeto Error con un mensaje
-				return new Error('Error changing password');
-			}
-		},
+		// 		// Devolver un mensaje indicando que el envío del correo fue exitoso
+		// 		return account?.user;
+		// 	} catch (error) {
+		// 		// En caso de que ocurra un error durante el proceso, devolver un objeto Error con un mensaje
+		// 		return new Error('Error changing password');
+		// 	}
+		// },
     updateUser: async (parent, args, { db, session }) => {
       const check = await checkSession({
         session,

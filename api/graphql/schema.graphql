@@ -57,13 +57,13 @@ input AccountUpdateInput {
 type Session {
   id: ID!
   sessionToken: String!
-  expires: AWSDateTime!
+  expires: Date!
   userId: String!
   user: User!
 }
 input SessionCreateInput {
   sessionToken: String!
-  expires: AWSDateTime!
+  expires: Date!
   userId: String!
 }
 input SessionWhereUniqueInput {
@@ -71,7 +71,7 @@ input SessionWhereUniqueInput {
 }
 input SessionUpdateInput {
   sessionToken: String
-  expires: AWSDateTime
+  expires: Date
   userId: String
 }
 #--------------------------User-----------------------
@@ -80,21 +80,21 @@ type User {
   name: String!
   lastName: String
   email: String!
-  emailVerified: AWSDateTime
+  emailVerified: Date
   image: String
   identification: String
   account: Account
   sessions: [Session]
   role: Role!
   roleId: String!
-  createdAt: AWSDateTime!
-  updatedAt: AWSDateTime!
+  createdAt: Date!
+  updatedAt: Date!
 }
 input UserCreateInput {
   name: String!
   lastName: String
   email: String!
-  emailVerified: AWSDateTime
+  emailVerified: Date
   image: String
   identification: String
   roleId: String!
@@ -106,7 +106,7 @@ input UserUpdateInput {
   name: String
   lastName: String
   email: String
-  emailVerified: AWSDateTime
+  emailVerified: Date
   image: String
   identification: String
   roleId: String
@@ -116,8 +116,8 @@ type Role {
   id: ID!
   name: Enum_RoleName!
   users: [User]
-  createdAt: AWSDateTime!
-  updatedAt: AWSDateTime!
+  createdAt: Date!
+  updatedAt: Date!
 }
 input RoleCreateInput {
   name: Enum_RoleName!

@@ -21,7 +21,7 @@ const httpServer = http.createServer(app);
 const typeDefs = readFileSync(require.resolve('./graphql/schema.graphql')).toString('utf-8');
 
 const AWSTypes = `
-scalar AWSDateTime
+scalar Date
 scalar AWSJSON
 `;
 
