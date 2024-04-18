@@ -21,7 +21,9 @@
   },
   "dependencies": {
     "@as-integrations/aws-lambda": "^2.0.1",
+    "@aws-sdk/client-s3": "^3.556.0",
     "@aws-sdk/client-secrets-manager": "^3.477.0",
+    "@aws-sdk/s3-request-presigner": "^3.556.0",
     "@prisma/client": "^4.9.0",
     "body-parser": "1.20.2",
     "cors": "2.8.5",

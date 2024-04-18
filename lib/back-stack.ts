@@ -28,7 +28,9 @@ export class BackStack extends Stack {
     const vpc = this.buildVPC();
     const securityGroup = this.buildDatabaseSecurityGroup(vpc);
     const cluster = this.buildDatabase(vpc, securityGroup);
-    const lambda = this.buildServerLambda(cluster);
+    const buckets = this.buildS3Array(BUCKETS, env || '');
+    const privateBucket = buckets.find((bucket) => !bucket.isPublic);
+    const lambda = this.buildServerLambda(cluster, `${privateBucket?.name}-${env}`);
     const api = this.buildApiGateway(lambda);
     const secret = cluster.secret;
     //Se genera server de fargate cuando el entorno sea produccion
@@ -42,13 +44,6 @@ export class BackStack extends Stack {
     //     vpc
     //   );
     // }
-
-    BUCKETS.forEach((bucket) =>
-      this.buildS3({
-        name: `${bucket.name}-${env}`,
-        isPublic: bucket.isPublic || false,
-      })
-    );
   }
 
   addCustomerTags = (scope: Construct) => {
@@ -113,7 +108,7 @@ export class BackStack extends Stack {
     return apiGw;
   }
 
-  buildServerLambda(cluster?: rds.DatabaseInstance) {
+  buildServerLambda(cluster?: rds.DatabaseInstance, bucket?: string) {
     // Lambda resolver
     const identifier = `${CUSTOMER}-${PROJECT}-server-${this.deployEnvironment}`;
     const dockerfile = path.join(__dirname, '../api');
@@ -125,6 +120,7 @@ export class BackStack extends Stack {
       environment: {
         SECRET_ID: cluster?.secret?.secretArn || '',
         AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
+        BUCKET_NAME: bucket || '',
       },
     });
     this.addCustomerTags(dockerLambda);
@@ -241,6 +237,15 @@ export class BackStack extends Stack {
     });
     this.addCustomerTags(s3Bucket);
     return s3Bucket;
+  }
+  buildS3Array(buckets: BucketInput[], env: string) {
+    buckets.forEach((bucket) =>
+      this.buildS3({
+        name: `${bucket.name}-${env}`,
+        isPublic: bucket.isPublic || false,
+      })
+    );
+    return buckets;
   }
 
   buildDBManagerLambda(

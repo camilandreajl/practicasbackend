@@ -1,4 +1,5 @@
 // Resolvers
+import { generalResolvers } from './general/resolvers';
 import { accountResolvers } from './account/resolvers';
 import { sessionResolvers } from './session/resolvers';
 import { userResolvers } from './user/resolvers';
@@ -10,7 +11,7 @@ import { sessionTypes } from './session/types';
 import { userTypes } from './user/types';
 import { roleTypes } from './role/types';
 
-const resolverArray = [accountResolvers, sessionResolvers, userResolvers, roleResolvers];
+const resolverArray = [generalResolvers, accountResolvers, sessionResolvers, userResolvers, roleResolvers];
 const typesArray = [generalTypes, accountTypes, sessionTypes, userTypes, roleTypes];
 
 export { resolverArray, typesArray };
