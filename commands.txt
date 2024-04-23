@@ -1,13 +1,15 @@
-
-aws configure con credenciales de Prevalent
-
-# main repo packages
-yarn add aws-cdk-lib aws-sdk constructs source-map-support
-yarn add -D @types/node aws-cdk copyfiles rimraf ts-node typescript
-
-#configuración inicial:
+# configuración inicial:
 modificar el archivo config.ts para incluir el nombre del cliente, el nombre del proyecto, la region y la cuenta de aws si es necesario.
 
 # back deploy
 primero, solo una vez: cdk synth
 cada vez que se quiera re-desplegar: yarn deploy
+
+# instalar cdk
+bun install aws-cdk-lib
+
+# instalar typescript y ts node
+bun install -d typescript ts-node @types/node
+
+# instalar rimraf
+bun install -d rimraf
