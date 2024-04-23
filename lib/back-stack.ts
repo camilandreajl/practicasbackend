@@ -25,12 +25,13 @@ export class BackStack extends Stack {
 
     this.deployEnvironment = env || Environment.DEV;
 
+    const applicationSecrets = this.buildSecretsManager();
     const vpc = this.buildVPC();
     const securityGroup = this.buildDatabaseSecurityGroup(vpc);
     const cluster = this.buildDatabase(vpc, securityGroup);
     const buckets = this.buildS3Array(BUCKETS, env || '');
     const privateBucket = buckets.find((bucket) => !bucket.isPublic)?.bucket;
-    const lambda = this.buildServerLambda(cluster, privateBucket);
+    const lambda = this.buildServerLambda(cluster, privateBucket, applicationSecrets);
     const api = this.buildApiGateway(lambda);
     const secret = cluster.secret;
     //Se genera server de fargate cuando el entorno sea produccion
@@ -108,7 +109,11 @@ export class BackStack extends Stack {
     return apiGw;
   }
 
-  buildServerLambda(cluster?: rds.DatabaseInstance, bucket?: s3.Bucket) {
+  buildServerLambda(
+    cluster?: rds.DatabaseInstance,
+    bucket?: s3.Bucket,
+    applicationSecrets?: secretsManager.Secret
+  ) {
     // Lambda resolver
     const identifier = `${CUSTOMER}-${PROJECT}-server-${this.deployEnvironment}`;
     const dockerfile = path.join(__dirname, '../api');
@@ -121,6 +126,7 @@ export class BackStack extends Stack {
         SECRET_ID: cluster?.secret?.secretArn || '',
         AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
         BUCKET_NAME: bucket?.bucketName || '',
+        APPLICATION_SECRETS_ID: applicationSecrets?.secretArn || '',
       },
     });
     this.addCustomerTags(dockerLambda);
@@ -148,6 +154,16 @@ export class BackStack extends Stack {
             's3:ListBucket',
           ],
           resources: [bucket.bucketArn || ''],
+        })
+      );
+    }
+    if (applicationSecrets) {
+      // Grant access to the secret manager
+      dockerLambda.addToRolePolicy(
+        new iam.PolicyStatement({
+          effect: iam.Effect.ALLOW,
+          actions: ['secretsmanager:GetSecretValue'],
+          resources: [applicationSecrets.secretArn || ''],
         })
       );
     }
@@ -449,5 +465,19 @@ export class BackStack extends Stack {
     this.addCustomerTags(service);
     this.addCustomerTags(service.service);
     return service;
+  }
+
+  buildSecretsManager() {
+    // Define the secret for the SSH private key
+    const secret = new secretsManager.Secret(
+      this,
+      `${CUSTOMER}-${PROJECT}-application-secrets-${this.deployEnvironment}`,
+      {
+        secretName: `${CUSTOMER}-${PROJECT}-application-secrets-${this.deployEnvironment}`,
+        description: 'Secrets for the application',
+      }
+    );
+
+    return secret;
   }
 }
