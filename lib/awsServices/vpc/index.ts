@@ -1,6 +1,6 @@
 import { Construct } from 'constructs';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
-import { CIDR_RANGE, CUSTOMER, PROJECT } from '../../config';
+import { CIDR_RANGE, CUSTOMER, PROJECT } from '../../../config';
 
 export class vpcConstructor extends Construct {
   buildVPC(deployEnvironment: string) {

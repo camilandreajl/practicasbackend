@@ -6,7 +6,7 @@ import * as iam from 'aws-cdk-lib/aws-iam';
 import * as path from 'path';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
-import { CIDR_RANGE, CUSTOMER, PROJECT } from '../../config';
+import { CIDR_RANGE, CUSTOMER, PROJECT } from '../../../config';
 
 export class lambdaConstructor extends Construct {
   buildDBManagerLambda(
