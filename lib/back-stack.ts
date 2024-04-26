@@ -34,17 +34,16 @@ export class BackStack extends Stack {
     const lambda = this.buildServerLambda(cluster, privateBucket, applicationSecrets);
     const api = this.buildApiGateway(lambda);
     const secret = cluster.secret;
-    //Se genera server de fargate cuando el entorno sea produccion
-    // if (this.deployEnvironment === Environment.PROD) {
-    //   //ecs fargate for gateway
-    //   const { cluster: ecsCluster, fargateTaskDefinition } =
-    //     this.buildECSCluster("../api", secret, vpc);
-    //   const ecsService = this.buildECSFargateService(
-    //     ecsCluster,
-    //     fargateTaskDefinition,
-    //     vpc
-    //   );
-    // }
+    // Se genera server de fargate cuando el entorno sea produccion
+    if (this.deployEnvironment === Environment.PROD) {
+      //ecs fargate for gateway
+      const { cluster: ecsCluster, fargateTaskDefinition } = this.buildECSCluster(
+        '../api',
+        secret,
+        vpc
+      );
+      const ecsService = this.buildECSFargateService(ecsCluster, fargateTaskDefinition, vpc);
+    }
   }
 
   addCustomerTags = (scope: Construct) => {
@@ -153,7 +152,7 @@ export class BackStack extends Stack {
             's3:GetBucketLocation',
             's3:ListBucket',
           ],
-          resources: [bucket.bucketArn || ''],
+          resources: [bucket.bucketArn || '', `${bucket.bucketArn}/*`],
         })
       );
     }
