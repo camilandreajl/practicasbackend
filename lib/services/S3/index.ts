@@ -2,7 +2,7 @@ import { Construct } from 'constructs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import { RemovalPolicy } from 'aws-cdk-lib';
 
-export class S3Constructor extends Construct {
+export class S3 extends Construct {
   public bucket: s3.Bucket;
   constructor(scope: Construct, id: string, props: any) {
     super(scope, id);

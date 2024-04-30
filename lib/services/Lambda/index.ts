@@ -8,7 +8,11 @@ import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 import { CIDR_RANGE, CUSTOMER, PROJECT } from '../../../config';
 
-export class lambdaConstructor extends Construct {
+export class Lambda extends Construct {
+  constructor(scope: Construct, id: string) {
+    super(scope, id);
+  }
+
   buildDBManagerLambda(
     rdsInstance: rds.DatabaseInstance,
     {

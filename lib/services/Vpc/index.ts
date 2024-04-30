@@ -2,7 +2,10 @@ import { Construct } from 'constructs';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import { CIDR_RANGE, CUSTOMER, PROJECT } from '../../../config';
 
-export class vpcConstructor extends Construct {
+export class Vpc extends Construct {
+  constructor(scope: Construct, id: string) {
+    super(scope, id);
+  }
   buildVPC(deployEnvironment: string) {
     const identifier = `${CUSTOMER}-${PROJECT}-vpc-${deployEnvironment}`;
     const vpc = new ec2.Vpc(this, identifier, {

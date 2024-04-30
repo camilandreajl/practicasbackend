@@ -14,6 +14,7 @@ import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as events from 'aws-cdk-lib/aws-events';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 import * as secretsManager from 'aws-cdk-lib/aws-secretsmanager';
+import { ApiGateway } from './services/ApiGateway';
 import { BUCKETS, CIDR_RANGE, CUSTOMER, PROJECT } from '../config';
 import { BucketInput, Environment } from '../types';
 import { ScheduleType, buildCron } from '../utils/cron';
@@ -24,7 +25,6 @@ export class BackStack extends Stack {
     super(scope, id, props);
 
     this.deployEnvironment = env || Environment.DEV;
-
     const applicationSecrets = this.buildSecretsManager();
     const vpc = this.buildVPC();
     const securityGroup = this.buildDatabaseSecurityGroup(vpc);
@@ -32,6 +32,8 @@ export class BackStack extends Stack {
     const buckets = this.buildS3Array(BUCKETS, env || '');
     const privateBucket = buckets.find((bucket) => !bucket.isPublic)?.bucket;
     const lambda = this.buildServerLambda(cluster, privateBucket, applicationSecrets);
+    const apiGatewayClass = new ApiGatewayConstructor();
+    apiGatewayClass.buildApiGateway(lambda, this.deployEnvironment);
     const api = this.buildApiGateway(lambda);
     const secret = cluster.secret;
     //Se genera server de fargate cuando el entorno sea produccion

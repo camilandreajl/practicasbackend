@@ -2,13 +2,23 @@ import { Construct } from 'constructs';
 import * as cdk from 'aws-cdk-lib';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 import * as rds from 'aws-cdk-lib/aws-rds';
-import { ScheduleType, buildCron } from '../utils/cron';
+import { ScheduleType, buildCron } from '../../../utils/cron';
 import * as secretsManager from 'aws-cdk-lib/aws-secretsmanager';
-import { lambdaConstructor } from '../lambda';
-import { BucketInput, Environment } from '../types';
-import { BUCKETS, CIDR_RANGE, CUSTOMER, PROJECT } from '../config';
+import { Lambda } from '../Lambda';
+import { Environment } from '../../../types';
+import { CUSTOMER, PROJECT } from '../../../config';
+import { SecretsManager } from '../SecretManager';
 
-export class rdsConstructor extends Construct {
+export class Rds extends Construct {
+  secret: secretsManager;
+  constructor(scope: Construct, id: string) {
+    super(scope, id);
+    this.secret = new SecretsManager(scope, id).buildSecretManager(
+      'rds-secret',
+      'secret to keep rds connection string'
+    );
+  }
+
   buildDatabase(vpc: ec2.IVpc, securityGroup: ec2.SecurityGroup, deployEnvironment: string) {
     // secret for postgres database
     const secretIdentifier = `${CUSTOMER}-${PROJECT}-dbsecret-${deployEnvironment}`;
@@ -23,8 +33,6 @@ export class rdsConstructor extends Construct {
         excludeCharacters: '"@/\\-#{[()]};:=`,.\'<>!$%^&*()+~|?',
       },
     });
-    //this.addCustomerTags(databaseSecret);
-    // postgres rds database
 
     const project = PROJECT.toLowerCase().replace(/-/g, '_');
     const identifier = `${CUSTOMER.toLowerCase()}-${project}-db-${deployEnvironment}`;
@@ -55,8 +63,10 @@ export class rdsConstructor extends Construct {
 
     if (deployEnvironment === Environment.PROD) {
       // add a lambda function to turn off or start the database
-      const lambdaClass = new lambdaConstructor();
-      const dbManagerLambda = lambdaClass.buildDBManagerLambda(
+      new Lambda(
+        this,
+        `${CUSTOMER.toLowerCase()}-${PROJECT}-dbmanager-${deployEnvironment}`
+      ).buildDBManagerLambda(
         cluster,
         {
           startSchedule: null,
@@ -68,8 +78,10 @@ export class rdsConstructor extends Construct {
 
     if (deployEnvironment === Environment.DEV) {
       // add a lambda function to turn off or start the database
-      const lambdaClass = new lambdaConstructor();
-      const dbManagerLambda = lambdaClass.buildDBManagerLambda(
+      new Lambda(
+        this,
+        `${CUSTOMER.toLowerCase()}-${PROJECT}-dbmanager-${deployEnvironment}`
+      ).buildDBManagerLambda(
         cluster,
         {
           startSchedule: null, // buildCron(ScheduleType.EVERY_DAY, 6, -5),
