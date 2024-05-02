@@ -10,7 +10,7 @@ import { CUSTOMER, PROJECT } from '../../../config';
 import { SecretsManager } from '../SecretManager';
 
 export class Rds extends Construct {
-  secret: secretsManager;
+  private secret: secretsManager.Secret;
   constructor(scope: Construct, id: string) {
     super(scope, id);
     this.secret = new SecretsManager(scope, id).buildSecretManager(

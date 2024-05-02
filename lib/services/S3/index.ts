@@ -4,17 +4,16 @@ import { RemovalPolicy } from 'aws-cdk-lib';
 
 export class S3 extends Construct {
   public bucket: s3.Bucket;
-  constructor(scope: Construct, id: string, props: any) {
+  constructor(scope: Construct, id: string) {
     super(scope, id);
-    const bucket = this.s3Constructor(props);
   }
-  s3Constructor(props: any) {
-    const s3Bucket = new s3.Bucket(this, props.name, {
-      bucketName: props.name,
+  buildS3(name: string, isPublic: boolean) {
+    const s3Bucket = new s3.Bucket(this, name, {
+      bucketName: name,
       autoDeleteObjects: true,
       removalPolicy: RemovalPolicy.DESTROY,
       versioned: false,
-      publicReadAccess: props.isPublic,
+      publicReadAccess: isPublic,
       objectOwnership: s3.ObjectOwnership.OBJECT_WRITER,
       encryption: s3.BucketEncryption.S3_MANAGED,
       cors: [
@@ -29,7 +28,7 @@ export class S3 extends Construct {
           allowedHeaders: ['*'],
         },
       ],
-      ...(props.isPublic
+      ...(isPublic
         ? {
             blockPublicAccess: {
               blockPublicAcls: false,
