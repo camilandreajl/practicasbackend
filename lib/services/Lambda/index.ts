@@ -6,11 +6,77 @@ import * as iam from 'aws-cdk-lib/aws-iam';
 import * as path from 'path';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
+import { Duration } from 'aws-cdk-lib';
+import * as secretsManager from 'aws-cdk-lib/aws-secretsmanager';
+import * as s3 from 'aws-cdk-lib/aws-s3';
 import { CIDR_RANGE, CUSTOMER, PROJECT } from '../../../config';
+import { Environment } from 'types';
+import { env } from 'process';
 
 export class Lambda extends Construct {
   constructor(scope: Construct, id: string) {
     super(scope, id);
+  }
+
+  buildServerLambda(
+    cluster?: rds.DatabaseInstance,
+    bucket?: s3.Bucket,
+    applicationSecrets?: secretsManager.Secret,
+    environment?: Environment
+  ) {
+    // Lambda resolver
+    const identifier = `${CUSTOMER}-${PROJECT}-server-${environment}`;
+    const dockerfile = path.join(__dirname, '../api');
+    const dockerLambda = new lambda.DockerImageFunction(this, identifier, {
+      functionName: identifier,
+      code: lambda.DockerImageCode.fromImageAsset(dockerfile),
+      memorySize: 1024,
+      timeout: Duration.seconds(60),
+      environment: {
+        SECRET_ID: cluster?.secret?.secretArn || '',
+        AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
+        BUCKET_NAME: bucket?.bucketName || '',
+        APPLICATION_SECRETS_ID: applicationSecrets?.secretArn || '',
+      },
+    });
+    if (cluster) {
+      // Grant access to Secrets manager to fetch the secret
+      dockerLambda.addToRolePolicy(
+        new iam.PolicyStatement({
+          effect: iam.Effect.ALLOW,
+          actions: ['secretsmanager:GetSecretValue'],
+          resources: [cluster.secret?.secretArn || ''],
+        })
+      );
+    }
+    if (bucket) {
+      // Grant access to the private bucket
+      dockerLambda.addToRolePolicy(
+        new iam.PolicyStatement({
+          effect: iam.Effect.ALLOW,
+          actions: [
+            's3:PutObject',
+            's3:GetObject',
+            's3:DeleteObject',
+            's3:GetObjectVersion',
+            's3:GetBucketLocation',
+            's3:ListBucket',
+          ],
+          resources: [bucket.bucketArn || ''],
+        })
+      );
+    }
+    if (applicationSecrets) {
+      // Grant access to the secret manager
+      dockerLambda.addToRolePolicy(
+        new iam.PolicyStatement({
+          effect: iam.Effect.ALLOW,
+          actions: ['secretsmanager:GetSecretValue'],
+          resources: [applicationSecrets.secretArn || ''],
+        })
+      );
+    }
+    return dockerLambda;
   }
 
   buildDBManagerLambda(

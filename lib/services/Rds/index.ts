@@ -94,4 +94,20 @@ export class Rds extends Construct {
     //this.addCustomerTags(cluster);
     return cluster;
   }
+  buildDatabaseSecurityGroup(vpc: ec2.Vpc, environment: Environment) {
+    const identifier = `db-sg-${environment}`;
+    const securityGroup = new ec2.SecurityGroup(this, identifier, {
+      securityGroupName: identifier,
+      vpc,
+      description: 'Allow postgres access',
+      allowAllOutbound: true, // set to false if you want to control outbound traffic
+    });
+
+    securityGroup.addIngressRule(
+      ec2.Peer.anyIpv4(), // or specify a particular CIDR block or security group
+      ec2.Port.tcp(5432)
+    );
+
+    return securityGroup;
+  }
 }

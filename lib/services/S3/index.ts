@@ -1,6 +1,7 @@
 import { Construct } from 'constructs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import { RemovalPolicy } from 'aws-cdk-lib';
+import { BucketInput } from '../../../types';
 
 export class S3 extends Construct {
   public bucket: s3.Bucket;
@@ -40,5 +41,14 @@ export class S3 extends Construct {
         : {}),
     });
     return s3Bucket;
+  }
+
+  buildS3Array(buckets: BucketInput[], env: string) {
+    return buckets.map((bucket) => {
+      return {
+        isPublic: bucket.isPublic || false,
+        bucket: this.buildS3(`${bucket.name}-${env}`, bucket.isPublic || false),
+      };
+    });
   }
 }
