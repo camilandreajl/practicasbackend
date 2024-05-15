@@ -1,7 +1,7 @@
 import { Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { Environment } from '../types';
-import { ApiGateway } from './services/APIGateway1';
+import { ApiGateway } from './services/APIGateway';
 import { Fargate } from './services/Fargate';
 import { Lambda } from './services/Lambda';
 import { Rds } from './services/Rds';
