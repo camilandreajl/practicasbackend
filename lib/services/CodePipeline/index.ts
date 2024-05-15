@@ -1,6 +1,6 @@
 import { Construct } from 'constructs';
 import { CIDR_RANGE, CUSTOMER, PROJECT, ACCOUNT, REPO } from '../../../config';
-import { SecretsManager } from '../SecretManager';
+import { SecretsManager } from '../SecretsManager';
 import { Scope } from 'aws-cdk-lib/aws-ecs';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import * as iam from 'aws-cdk-lib/aws-iam';

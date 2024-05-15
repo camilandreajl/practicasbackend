@@ -7,7 +7,7 @@ import * as secretsManager from 'aws-cdk-lib/aws-secretsmanager';
 import { Lambda } from '../Lambda';
 import { Environment } from '../../../types';
 import { CUSTOMER, PROJECT } from '../../../config';
-import { SecretsManager } from '../SecretManager';
+import { SecretsManager } from '../SecretsManager';
 
 export class Rds extends Construct {
   private secret: secretsManager.Secret;

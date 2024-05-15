@@ -3,7 +3,7 @@ import { Construct } from 'constructs';
 
 import { ACCOUNT, CUSTOMER, PROJECT, REPO } from '../config';
 import { Environment } from '../types';
-import { SecretsManager } from './services/SecretManager';
+import { SecretsManager } from './services/SecretsManager';
 import { Pipeline } from './services/CodePipeline';
 
 export class PipelineStack extends cdk.Stack {
