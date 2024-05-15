@@ -4,7 +4,7 @@ import { Construct } from 'constructs';
 import { ACCOUNT, CUSTOMER, PROJECT, REPO } from '../config';
 import { Environment } from '../types';
 import { SecretsManager } from './services/SecretsManager';
-import { Pipeline } from './services/CodePipeline';
+import { CodePipeline } from './services/CodePipeline';
 
 export class PipelineStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -17,7 +17,7 @@ export class PipelineStack extends cdk.Stack {
     );
 
     // crear un role para que el pipeline pueda desplegar
-    const pipeLine = new Pipeline(scope, id);
+    const pipeLine = new CodePipeline(scope, id);
     const role = pipeLine.buildPipelineRole();
 
     // construir el pipeline de DEV

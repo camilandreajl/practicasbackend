@@ -11,7 +11,7 @@ import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as cdk from 'aws-cdk-lib';
 import { Environment } from '../../../types';
 
-export class Pipeline extends Construct {
+export class CodePipeline extends Construct {
   constructor(scope: Construct, id: string) {
     super(scope, id);
   }
