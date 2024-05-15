@@ -4,7 +4,7 @@ import { Environment } from '../types';
 import { ApiGateway } from './services/APIGateway';
 import { Fargate } from './services/Fargate';
 import { Lambda } from './services/Lambda';
-import { Rds } from './services/RDS1';
+import { Rds } from './services/RDS';
 import { S3 } from './services/S3';
 import { SecretsManager } from './services/SecretManager';
 import { Vpc } from './services/Vpc';
