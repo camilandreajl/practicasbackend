@@ -94,8 +94,8 @@ export class CodePipeline extends Construct {
               commands: [
                 'echo Instalando dependencias...',
                 'npm i -g rimraf',
-                'npm i -g yarn',
-                'yarn install',
+                'npm i -g bun',
+                'bun install',
               ],
             },
             // esto no es necesario si no utilizamos .env en el Dockerfile
@@ -111,7 +111,7 @@ export class CodePipeline extends Construct {
             build: {
               commands: [
                 'echo Desplegando el aplicativo...',
-                `yarn deploy:${env === Environment.PROD ? 'prod' : 'dev'}`,
+                `bun run deploy:${env === Environment.PROD ? 'prod' : 'dev'}`,
               ],
             },
           },
