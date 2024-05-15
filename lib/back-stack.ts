@@ -4,7 +4,7 @@ import { Environment } from '../types';
 import { APIGateway } from './services/APIGateway';
 import { Fargate } from './services/Fargate';
 import { Lambda } from './services/Lambda';
-import { Rds } from './services/RDS';
+import { RDS } from './services/RDS';
 import { S3 } from './services/S3';
 import { SecretsManager } from './services/SecretsManager';
 import { Vpc } from './services/VPC';
@@ -27,7 +27,7 @@ export class BackStack extends Stack {
 
     const vpc = new Vpc(scope, id).buildVPC(this.deployEnvironment);
 
-    const rds = new Rds(scope, id);
+    const rds = new RDS(scope, id);
     const securityGroup = rds.buildDatabaseSecurityGroup(vpc, this.deployEnvironment);
     const cluster = rds.buildDatabase(vpc, securityGroup, this.deployEnvironment);
 

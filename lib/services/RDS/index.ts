@@ -9,7 +9,7 @@ import { Environment } from '../../../types';
 import { CUSTOMER, PROJECT } from '../../../config';
 import { SecretsManager } from '../SecretsManager';
 
-export class Rds extends Construct {
+export class RDS extends Construct {
   private secret: secretsManager.Secret;
   constructor(scope: Construct, id: string) {
     super(scope, id);
