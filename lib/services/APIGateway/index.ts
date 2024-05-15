@@ -3,7 +3,7 @@ import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as apiGateway from 'aws-cdk-lib/aws-apigateway';
 import { CIDR_RANGE, CUSTOMER, PROJECT } from '../../../config';
 
-export class ApiGateway extends Construct {
+export class APIGateway extends Construct {
   constructor(scope: Construct, id: string) {
     super(scope, id);
   }

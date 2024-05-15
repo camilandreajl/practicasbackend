@@ -1,7 +1,7 @@
 import { Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { Environment } from '../types';
-import { ApiGateway } from './services/APIGateway';
+import { APIGateway } from './services/APIGateway';
 import { Fargate } from './services/Fargate';
 import { Lambda } from './services/Lambda';
 import { Rds } from './services/RDS';
@@ -41,7 +41,7 @@ export class BackStack extends Stack {
       applicationSecret
     );
 
-    const apiGateway = new ApiGateway(scope, id).buildApiGateway(lambda, this.deployEnvironment);
+    const apiGateway = new APIGateway(scope, id).buildApiGateway(lambda, this.deployEnvironment);
 
     //Se genera server de fargate cuando el entorno sea produccion y el aplicativo lo requiera, de lo contrario desplegar en lambda
     // if (this.deployEnvironment === Environment.PROD) {
