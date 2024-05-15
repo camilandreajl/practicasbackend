@@ -7,7 +7,7 @@ import { Lambda } from './services/Lambda';
 import { RDS } from './services/RDS';
 import { S3 } from './services/S3';
 import { SecretsManager } from './services/SecretsManager';
-import { Vpc } from './services/VPC';
+import { VPC } from './services/VPC';
 import { BUCKETS } from '../config';
 export class BackStack extends Stack {
   deployEnvironment: Environment;
@@ -25,7 +25,7 @@ export class BackStack extends Stack {
       'secret to keep environment variables'
     );
 
-    const vpc = new Vpc(scope, id).buildVPC(this.deployEnvironment);
+    const vpc = new VPC(scope, id).buildVPC(this.deployEnvironment);
 
     const rds = new RDS(scope, id);
     const securityGroup = rds.buildDatabaseSecurityGroup(vpc, this.deployEnvironment);
