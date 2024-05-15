@@ -7,7 +7,7 @@ import { Lambda } from './services/Lambda';
 import { Rds } from './services/RDS';
 import { S3 } from './services/S3';
 import { SecretsManager } from './services/SecretsManager';
-import { Vpc } from './services/VPC1';
+import { Vpc } from './services/VPC';
 import { BUCKETS } from '../config';
 export class BackStack extends Stack {
   deployEnvironment: Environment;
