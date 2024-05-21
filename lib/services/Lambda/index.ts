@@ -111,7 +111,7 @@ export class Lambda extends Construct {
     const dbManagerLambda = new lambda.Function(this, 'DBManagerLambda', {
       functionName: `${CUSTOMER}-${PROJECT}-lambda-dbmanager-${deployEnvironment}`,
       runtime: lambda.Runtime.PYTHON_3_8,
-      code: lambda.Code.fromAsset(path.join(__dirname, '../utils/dbmanager')),
+      code: lambda.Code.fromAsset(path.join(__dirname, '@utils/dbmanager')),
       handler: 'main.handler',
       role: lambdaRole,
       environment: {

@@ -5,7 +5,6 @@ import express from 'express';
 import http from 'http';
 import cors from 'cors';
 import bodyParser from 'body-parser';
-import { readFileSync } from 'fs';
 import { getDB } from './src/db';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { getSession } from './src/auth/getSession';
@@ -19,41 +18,41 @@ const app = express();
 const httpServer = http.createServer(app);
 
 const schema = makeExecutableSchema({
-	typeDefs: typesArray,
-	resolvers: resolverArray,
+  typeDefs: typesArray,
+  resolvers: resolverArray,
 });
 
 export const server = new ApolloServer({
-	schema: schema,
-	plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+  schema: schema,
+  plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
 });
 
 const main = async () => {
-	await server.start();
+  await server.start();
 
-	app.get('/healthcheck', (req, res) => {
-		return res.status(200).send('OK');
-	});
+  app.get('/healthcheck', (req, res) => {
+    return res.status(200).send('OK');
+  });
 
-	app.use(
-		'/',
-		cors<cors.CorsRequest>(),
-		bodyParser.json(),
-		// expressMiddleware accepts the same arguments:
-		// an Apollo Server instance and optional configuration options
-		expressMiddleware(server, {
-			context: async ({ req }) => {
-				const sessionToken: string | string[] | undefined = req.headers['next-auth.session-token'];
-				const db = await getDB();
-				const { user, session } = await getSession(db, sessionToken);
-				return { db, user, session };
-			},
-		})
-	);
+  app.use(
+    '/',
+    cors<cors.CorsRequest>(),
+    bodyParser.json(),
+    // expressMiddleware accepts the same arguments:
+    // an Apollo Server instance and optional configuration options
+    expressMiddleware(server, {
+      context: async ({ req }) => {
+        const sessionToken: string | string[] | undefined = req.headers['next-auth.session-token'];
+        const db = await getDB();
+        const { user, session } = await getSession(db, sessionToken);
+        return { db, user, session };
+      },
+    })
+  );
 
-	await new Promise<void>((resolve) => httpServer.listen({ port: 80 }, resolve));
+  await new Promise<void>((resolve) => httpServer.listen({ port: 80 }, resolve));
 
-	console.log(`🚀 Server ready and running!`);
+  console.log(`🚀 Server ready and running!`);
 };
 
 main();
