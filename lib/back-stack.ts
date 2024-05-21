@@ -18,18 +18,19 @@ export class BackStack extends Stack {
 
     const dbSecret = new SecretsManager(this, `${id}-dbSecret`).buildSecretManager(
       'dbSecret',
-      'secret to keep db credentials'
+      'secret to keep db credentials',
+      true
     );
     const applicationSecret = new SecretsManager(
       this,
       `${id}-applicationSecret`
-    ).buildSecretManager('applicationSecret', 'secret to keep environment variables');
+    ).buildSecretManager('applicationSecret', 'secret to keep environment variables', false);
 
     const vpc = new VPC(this, `${id}-vpc`).buildVPC(this.deployEnvironment);
 
     const rds = new RDS(this, `${id}-rds`);
     const securityGroup = rds.buildDatabaseSecurityGroup(vpc, this.deployEnvironment);
-    const cluster = rds.buildDatabase(vpc, securityGroup, this.deployEnvironment);
+    const cluster = rds.buildDatabase(vpc, securityGroup, dbSecret, this.deployEnvironment);
 
     const s3 = new S3(this, `${id}-s3`);
     const buckets = s3.buildS3Array(BUCKETS, this.deployEnvironment);
