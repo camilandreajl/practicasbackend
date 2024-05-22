@@ -1,0 +1,6 @@
+{
+  "eslint.options": {
+    "overrideConfigFile": "api/eslint.config.mjs"
+  },
+  "eslint.validate": ["typescript"]
+}

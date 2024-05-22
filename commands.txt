@@ -1,9 +1,9 @@
 # configuración inicial:
-modificar el archivo config.ts para incluir el nombre del cliente, el nombre del proyecto, la region y la cuenta de aws si es necesario.
+modificar el archivo config.ts para incluir el nombre del cliente, el nombre del proyecto, la region y la cuenta de aws si es necesario y los buckets.
 
 # back deploy
 primero, solo una vez: cdk synth
-cada vez que se quiera re-desplegar: yarn deploy
+cada vez que se quiera re-desplegar: yarn deploy:dev, yarn deploy:prod o yarn deploy:all según se requiera
 
 # instalar cdk
 bun install aws-cdk-lib

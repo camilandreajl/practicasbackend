@@ -1,6 +1,6 @@
 import { default as DataLoader } from 'dataloader';
 import { Account, Session, Role } from '@prisma/client';
-import { getDB } from '../../db';
+import { getDB } from '@/db';
 
 //one to one
 const accountLoader =

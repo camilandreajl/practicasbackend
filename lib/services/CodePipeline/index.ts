@@ -71,7 +71,45 @@ export class CodePipeline extends Construct {
     };
 
     // stage 2 para build
-    // const buildStage: cdk.aws_codepipeline.StageProps = {};
+    const lintProject = new codebuild.PipelineProject(
+      this,
+      `${CUSTOMER}-${PROJECT}-lintproject-${env}`,
+      {
+        environment: {
+          buildImage: codebuild.LinuxBuildImage.STANDARD_7_0,
+          privileged: true, // necesario para poder usar docker dentro del build
+        },
+        role: codeBuildServiceRole,
+        buildSpec: codebuild.BuildSpec.fromObject({
+          version: '0.2',
+          phases: {
+            install: {
+              commands: [
+                'echo Instalando dependencias...',
+                'npm i -g rimraf',
+                'npm i -g bun',
+                'cd api',
+                'bun install',
+              ],
+            },
+            post_build: {
+              commands: ['echo ejecutando el linter...', 'bun lint'],
+            },
+          },
+        }),
+      }
+    );
+
+    const lintAction = new codepipeline_actions.CodeBuildAction({
+      actionName: 'lintApplication',
+      input: pipelineSourceArtifact,
+      project: lintProject,
+    });
+
+    const lintStage: cdk.aws_codepipeline.StageProps = {
+      stageName: `Lint-${env}`,
+      actions: [lintAction],
+    };
 
     // // stage 3 para test
     // const testStage: cdk.aws_codepipeline.StageProps = {};
@@ -135,7 +173,7 @@ export class CodePipeline extends Construct {
     const pipeline = new codepipeline.Pipeline(this, `${CUSTOMER}-${PROJECT}-pipeline-${env}`, {
       pipelineName: `${CUSTOMER}-${PROJECT}-pipeline-${env}`,
       artifactBucket: pipelineArtifactBucket,
-      stages: [sourceStage, deployStage],
+      stages: [sourceStage, lintStage, deployStage],
     });
   }
 }

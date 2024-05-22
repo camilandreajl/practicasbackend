@@ -1,6 +1,3 @@
-# instalar cors
-bun install cors
-
 # instalar aws s3
 bun install @aws-sdk/client-s3
 
@@ -22,9 +19,6 @@ bun install body-parser
 # instalar nanoid
 bun install nanoid
 
-# instalar node-fetch
-bun install node-fetch
-
 # instalar nodemailer
 bun install nodemailer @types/nodemailer
 
@@ -42,6 +36,3 @@ bun install dotenv
 
 # instalar esbuild
 bun install esbuild
-
-# instalar fs
-bun install fs

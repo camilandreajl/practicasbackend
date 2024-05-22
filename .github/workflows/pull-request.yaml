@@ -1,0 +1,52 @@
+name: PR Build and Test Workflow
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  Lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js 20
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+      - uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+      - name: Install Dependencies
+        run: |
+          cd api
+          bun install
+      - name: Cache Node modules
+        uses: actions/cache@v1
+        with:
+          path: api/node_modules
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('api/**/bun.lock') }}
+      - name: Lint
+        run: |
+          cd api
+          bun run lint
+
+#-- Descomentar de aca para arriba
+
+# Test:
+#   needs: Build
+#   runs-on: ubuntu-latest
+#   steps:
+#     - uses: actions/checkout@v3
+#     - name: Use Node.js 20
+#       uses: actions/setup-node@v3
+#       with:
+#         node-version: '20'
+#     - uses: oven-sh/setup-bun@v1
+#       with:
+#         bun-version: latest
+#     - name: Cache Node modules
+#       uses: actions/cache@v1
+#       with:
+#         path: node_modules
+#         key: ${{ runner.os }}-node_modules-${{ hashFiles('**/bun.lock') }}
+#     - name: Test
+#       run: bun test:ci

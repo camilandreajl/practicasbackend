@@ -1,13 +1,8 @@
 import { PrismaClient } from '@prisma/client';
-import { SecretsManagerClient, GetSecretValueCommand } from '@aws-sdk/client-secrets-manager';
-
-const getTestEnv = () => {
-  if (process?.env?.TEST === 'true') {
-    return true;
-  }
-
-  return false;
-};
+import {
+  SecretsManagerClient,
+  GetSecretValueCommand,
+} from '@aws-sdk/client-secrets-manager';
 
 const sm = new SecretsManagerClient({ region: 'us-east-1' });
 
@@ -24,12 +19,13 @@ export const getDB = async () => {
     const dbURL = await sm.send(getSecretValueCommand);
 
     const secretString = JSON.parse(dbURL.SecretString || '{}');
+
     url = `postgresql://${secretString.username}:${secretString.password}@${secretString.host}:${secretString.port}/${secretString.dbname}?schema=dev`;
   } catch (e) {
+    // eslint-disable-next-line no-console
     console.log('Error getting secret', e);
   }
 
-  console.log('connection string: ', url);
   db = new PrismaClient({ datasources: { db: { url } } });
   return db;
 };

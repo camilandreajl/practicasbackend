@@ -1,6 +1,6 @@
-import { Resolver } from '../../types';
+import { Resolver } from '@/types';
 import { roleDataLoader } from './dataLoaders';
-import { checkSession } from '../../auth/checkSession';
+import { checkSession } from '@/auth/checkSession';
 
 const roleResolvers: Resolver = {
   Role: {

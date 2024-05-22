@@ -10,29 +10,33 @@ import { CUSTOMER, PROJECT } from '../../../config';
 import { SecretsManager } from '../SecretsManager';
 
 export class RDS extends Construct {
-  private secret: secretsManager.Secret;
   constructor(scope: Construct, id: string) {
     super(scope, id);
-    this.secret = new SecretsManager(scope, id).buildSecretManager(
-      'rds-secret',
-      'secret to keep rds connection string'
-    );
+    // this.secret = new SecretsManager(scope, id).buildSecretManager(
+    //   'rds-secret',
+    //   'secret to keep rds connection string'
+    // );
   }
 
-  buildDatabase(vpc: ec2.IVpc, securityGroup: ec2.SecurityGroup, deployEnvironment: string) {
+  buildDatabase(
+    vpc: ec2.IVpc,
+    securityGroup: ec2.SecurityGroup,
+    dbSecret: secretsManager.Secret,
+    deployEnvironment: string
+  ) {
     // secret for postgres database
-    const secretIdentifier = `${CUSTOMER}-${PROJECT}-dbsecret-${deployEnvironment}`;
-    const databaseSecret = new secretsManager.Secret(this, secretIdentifier, {
-      secretName: secretIdentifier,
-      generateSecretString: {
-        secretStringTemplate: JSON.stringify({
-          username: 'postgres', // cambiarlo si es necesario dependiendo del cliente.
-        }),
+    // const secretIdentifier = `${CUSTOMER}-${PROJECT}-dbsecret-${deployEnvironment}`;
+    // const databaseSecret = new secretsManager.Secret(this, secretIdentifier, {
+    //   secretName: secretIdentifier,
+    //   generateSecretString: {
+    //     secretStringTemplate: JSON.stringify({
+    //       username: 'postgres', // cambiarlo si es necesario dependiendo del cliente.
+    //     }),
 
-        generateStringKey: 'password',
-        excludeCharacters: '"@/\\-#{[()]};:=`,.\'<>!$%^&*()+~|?',
-      },
-    });
+    //     generateStringKey: 'password',
+    //     excludeCharacters: '"@/\\-#{[()]};:=`,.\'<>!$%^&*()+~|?',
+    //   },
+    // });
 
     const project = PROJECT.toLowerCase().replace(/-/g, '_');
     const identifier = `${CUSTOMER.toLowerCase()}-${project}-db-${deployEnvironment}`;
@@ -50,7 +54,7 @@ export class RDS extends Construct {
       vpcSubnets: {
         subnetType: ec2.SubnetType.PUBLIC,
       },
-      credentials: rds.Credentials.fromSecret(databaseSecret),
+      credentials: rds.Credentials.fromSecret(dbSecret),
       allocatedStorage: 20,
       instanceIdentifier: identifier,
       databaseName: `${project}`,

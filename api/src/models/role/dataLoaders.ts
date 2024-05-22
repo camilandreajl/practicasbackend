@@ -1,6 +1,6 @@
 import { default as DataLoader } from 'dataloader';
 import { User } from '@prisma/client';
-import { getDB } from '../../db';
+import { getDB } from '@/db';
 
 //many to one
 
