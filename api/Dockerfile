@@ -7,6 +7,8 @@ COPY ./.env ./
 COPY ./graphql ./graphql
 RUN npx prisma generate
 COPY ./src ./
+# Modify tsconfig.json to adjust the path
+RUN sed -i 's@"src/\*"@"\*"@' tsconfig.json
 RUN npm run build
 
 FROM public.ecr.aws/lambda/nodejs:18

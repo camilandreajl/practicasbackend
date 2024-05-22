@@ -11,7 +11,19 @@ import { sessionTypes } from './session/types';
 import { userTypes } from './user/types';
 import { roleTypes } from './role/types';
 
-const resolverArray = [generalResolvers, accountResolvers, sessionResolvers, userResolvers, roleResolvers];
-const typesArray = [generalTypes, accountTypes, sessionTypes, userTypes, roleTypes];
+const resolverArray = [
+  generalResolvers,
+  accountResolvers,
+  sessionResolvers,
+  userResolvers,
+  roleResolvers,
+];
+const typesArray = [
+  generalTypes,
+  accountTypes,
+  sessionTypes,
+  userTypes,
+  roleTypes,
+];
 
 export { resolverArray, typesArray };

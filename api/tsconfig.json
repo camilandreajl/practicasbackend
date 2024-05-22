@@ -23,7 +23,7 @@
     "esModuleInterop": true,
     "types": ["node"],
     "paths": {
-      "@api/*": ["./*"]
+      "@/*": ["src/*"]
     },
     "outDir": "dist"
   },
