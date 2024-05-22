@@ -11,14 +11,14 @@ export class PipelineStack extends cdk.Stack {
     super(scope, id, props);
 
     // crear un secrets manager para guardar el token de GitHub
-    const pipeLineSecret = new SecretsManager(scope, id).buildSecretManager(
+    const pipeLineSecret = new SecretsManager(this, `${id}-pipeLineSecret`).buildSecretManager(
       'pipeLineSecret',
       'secret to keep github credentials',
       false
     );
 
     // crear un role para que el pipeline pueda desplegar
-    const pipeLine = new CodePipeline(scope, id);
+    const pipeLine = new CodePipeline(this, `${id}-pipeLine`);
     const role = pipeLine.buildPipelineRole();
 
     // construir el pipeline de DEV
