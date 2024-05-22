@@ -26,7 +26,7 @@ export class Lambda extends Construct {
   ) {
     // Lambda resolver
     const identifier = `${CUSTOMER}-${PROJECT}-server-${environment}`;
-    const dockerfile = path.join(__dirname, '../api');
+    const dockerfile = 'api';
     const dockerLambda = new lambda.DockerImageFunction(this, identifier, {
       functionName: identifier,
       code: lambda.DockerImageCode.fromImageAsset(dockerfile),
@@ -111,7 +111,8 @@ export class Lambda extends Construct {
     const dbManagerLambda = new lambda.Function(this, 'DBManagerLambda', {
       functionName: `${CUSTOMER}-${PROJECT}-lambda-dbmanager-${deployEnvironment}`,
       runtime: lambda.Runtime.PYTHON_3_8,
-      code: lambda.Code.fromAsset(path.join(__dirname, '@utils/dbmanager')),
+      code: lambda.Code.fromAsset('utils/dbmanager'),
+      // code: lambda.Code.fromAsset(path.join(__dirname, 'utils/dbmanager')),
       handler: 'main.handler',
       role: lambdaRole,
       environment: {

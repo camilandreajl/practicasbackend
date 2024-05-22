@@ -1,10 +1,11 @@
 FROM public.ecr.aws/lambda/nodejs:18 as builder
 WORKDIR /usr/app
+RUN npm i -g bun
 COPY package.json ./
-RUN npm install
+RUN bun install
+COPY tsconfig.json ./
+COPY eslint.config.mjs ./
 COPY ./prisma ./prisma/
-COPY ./.env ./
-COPY ./graphql ./graphql
 RUN npx prisma generate
 COPY ./src ./
 # Modify tsconfig.json to adjust the path
@@ -16,7 +17,6 @@ WORKDIR ${LAMBDA_TASK_ROOT}
 COPY --from=builder /usr/app/package.json ./
 COPY --from=builder /usr/app/dist/* ./
 COPY --from=builder /usr/app/prisma/* ./prisma/
-COPY --from=builder /usr/app/graphql/* ./graphql/
 RUN npm install
 RUN npx prisma generate
 

@@ -47,12 +47,12 @@ export class BackStack extends Stack {
       this.deployEnvironment
     );
 
-    //Se genera server de fargate cuando el entorno sea produccion y el aplicativo lo requiera, de lo contrario desplegar en lambda
+    // Se genera server de fargate cuando el entorno sea produccion y el aplicativo lo requiera, de lo contrario desplegar en lambda
     // if (this.deployEnvironment === Environment.PROD) {
     //   //ecs fargate for gateway
     //   const fargate = new Fargate(this, `${id}-fargate`);
     //   const { cluster: ecsCluster, fargateTaskDefinition } = fargate.buildECSCluster(
-    //     '../api',
+    //     'api',
     //     dbSecret,
     //     vpc
     //   );

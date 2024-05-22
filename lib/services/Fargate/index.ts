@@ -31,11 +31,9 @@ export class Fargate extends Construct {
       cpu: 1024,
     });
 
-    const Dockerfile = path.join(__dirname, dockerFilePath);
-
     const container = fargateTaskDefinition.addContainer('TaskContainer', {
       // Use an image from Amazon ECR
-      image: ecs.ContainerImage.fromAsset(Dockerfile, {
+      image: ecs.ContainerImage.fromAsset(dockerFilePath, {
         file: 'Dockerfile.fargate',
       }),
       logging: ecs.LogDrivers.awsLogs({

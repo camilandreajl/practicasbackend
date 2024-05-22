@@ -20,6 +20,9 @@
     "esModuleInterop": true,
     "typeRoots": ["./node_modules/@types"],
     "baseUrl": "./",
+    "paths": {
+      "@/*": ["./*"]
+    },
     "outDir": "dist"
   },
   "exclude": ["node_modules", "cdk.out", "dist", "api"]
