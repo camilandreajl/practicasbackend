@@ -21,6 +21,7 @@ export class BackStack extends Stack {
       'secret to keep db credentials',
       true
     );
+    // Este secret es para almacenar las variables de entorno para evitar .env y deben ser guardadas manualmente por la consola de AWS
     const applicationSecret = new SecretsManager(
       this,
       `${id}-applicationSecret`
