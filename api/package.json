@@ -10,9 +10,7 @@
   "scripts": {
     "generate_build": "cosmo && npx prisma generate && prettier --config .prettierrc prisma/generated/graphql/**/*.ts --write && next build",
     "cosmo": "cosmo && prettier --config .prettierrc prisma/generated/graphql/**/*.ts --write",
-    "generate": "bun run aurora && npx prisma generate && bun run cosmo",
-    "migrate-dev": "bun run aurora && prisma migrate dev",
-    "migrate-deploy": "bun run aurora && npx prisma migrate deploy",
+    "generate": "npx prisma generate && bun run cosmo",
     "compile": "rimraf ./dist && tsc",
     "build": "esbuild index.ts --bundle --minify --sourcemap --platform=node --target=es2020 --outfile=dist/index.js",
     "start": "ts-node dev.ts",
