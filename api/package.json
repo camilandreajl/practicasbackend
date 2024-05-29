@@ -16,7 +16,7 @@
     "start": "ts-node dev.ts",
     "migration": "ts-node prisma/runMigration.ts",
     "start:prod": "node dist/index.js",
-    "b-start": "bun --hot index.ts",
+    "dev": "bun --hot index.ts",
     "lint": "eslint \"./src/**/*.ts\"",
     "lint:fix": "eslint \"./src/**/*.ts\" --fix"
   },
