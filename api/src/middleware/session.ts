@@ -82,20 +82,13 @@
 //     // }
 
 // export { sessionMiddleware, session  };
-import type {
-  APIGatewayProxyEvent,
-  APIGatewayProxyStructuredResultV2,
-} from 'aws-lambda';
+import type { APIGatewayProxyEvent, APIGatewayProxyStructuredResultV2 } from 'aws-lambda';
 import { handlers, middleware } from '@as-integrations/aws-lambda';
 
 const sessionMiddleware: middleware.MiddlewareFn<
-  handlers.RequestHandler<
-    APIGatewayProxyEvent,
-    APIGatewayProxyStructuredResultV2
-  >
+  handlers.RequestHandler<APIGatewayProxyEvent, APIGatewayProxyStructuredResultV2>
 > = async () => {
   // const sessionToken = event.headers['next-auth.session-token'] ?? null;
-  // const method = event['httpMethod'];
   // TODO - check if session is expired
   // if (session?.expires < new Date()) {
   //   result.body = JSON.stringify({ error: 'Session expired' });
