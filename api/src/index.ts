@@ -4,7 +4,7 @@ import { getDB } from './db';
 import { getSession } from './auth/getSession';
 
 import { resolverArray, typesArray } from './models';
-import { middlewareFunctions } from './middleware';
+import { middlewareFunctions, requestHandler } from './middleware';
 import { Context } from './types';
 
 const server = new ApolloServer<Context>({
@@ -13,13 +13,12 @@ const server = new ApolloServer<Context>({
   introspection: true,
 });
 
-const apiGatewayHandler = handlers.createAPIGatewayProxyEventRequestHandler();
-export const handler = startServerAndCreateLambdaHandler(server, apiGatewayHandler, {
+export const handler = startServerAndCreateLambdaHandler(server, requestHandler, {
   context: async ({ event }) => {
     const db = await getDB();
     const sessionToken: string | undefined = event.headers['next-auth.session-token'];
-    const Session = await getSession(db, sessionToken);
-    return { db, Session };
+    const session = await getSession(db, sessionToken);
+    return { db, session };
   },
   middleware: middlewareFunctions,
 });

@@ -1,4 +1,6 @@
 import { corsMiddleware } from './cors';
-import { sessionMiddleware } from './session';
+import { handlers } from '@as-integrations/aws-lambda';
 
-export const middlewareFunctions = [corsMiddleware, sessionMiddleware];
+export const requestHandler = handlers.createAPIGatewayProxyEventV2RequestHandler();
+
+export const middlewareFunctions = [corsMiddleware];

@@ -22,7 +22,7 @@ export type Session = {
 
 interface Context {
   db: db;
-  Session: Session;
+  session: Session;
 }
 
 interface ResolverFunction {
