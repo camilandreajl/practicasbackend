@@ -1,15 +1,7 @@
-import type {
-  APIGatewayProxyEvent,
-  APIGatewayProxyStructuredResultV2,
-} from 'aws-lambda';
-import { handlers, middleware } from '@as-integrations/aws-lambda';
+import { middleware } from '@as-integrations/aws-lambda';
+import { requestHandler } from '.';
 
-const corsMiddleware: middleware.MiddlewareFn<
-  handlers.RequestHandler<
-    APIGatewayProxyEvent,
-    APIGatewayProxyStructuredResultV2
-  >
-> = async () => {
+const corsMiddleware: middleware.MiddlewareFn<typeof requestHandler> = async () => {
   return async (result) => {
     result.headers = {
       ...result.headers,
