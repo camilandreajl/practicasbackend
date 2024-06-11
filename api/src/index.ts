@@ -18,8 +18,8 @@ export const handler = startServerAndCreateLambdaHandler(server, apiGatewayHandl
   context: async ({ event }) => {
     const db = await getDB();
     const sessionToken: string | undefined = event.headers['next-auth.session-token'];
-    const session = await getSession(db, sessionToken);
-    return { db, session };
+    const Session = await getSession(db, sessionToken);
+    return { db, Session };
   },
   middleware: middlewareFunctions,
 });

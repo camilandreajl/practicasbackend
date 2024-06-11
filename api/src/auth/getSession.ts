@@ -8,10 +8,14 @@ const getSession = async (db: db, sessionToken: string | undefined) => {
       user: {
         select: {
           role: true,
+          id: true,
         },
       },
     },
   });
+  if (!session) {
+    throw new Error('Session not found');
+  }
   return session;
 };
 

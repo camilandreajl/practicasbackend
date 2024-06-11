@@ -7,21 +7,22 @@ interface customEvent extends APIGatewayProxyEvent {
   session: Session;
 }
 
-type Session = {
+export type Session = {
   expires: Date;
   user: {
+    id: string;
     role: {
       id: string;
       name: Enum_RoleName;
       createdAt: Date;
       updatedAt: Date;
-    } | null;
+    };
   };
 } | null;
 
 interface Context {
   db: db;
-  session: Session;
+  Session: Session;
 }
 
 interface ResolverFunction {
