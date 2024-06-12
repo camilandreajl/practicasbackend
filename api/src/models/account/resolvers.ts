@@ -5,108 +5,52 @@ import { checkSession } from '@/auth/checkSession';
 const accountResolvers: Resolver = {
   Account: {
     user: async (parent, args, { db, session }) => {
-      const check = await checkSession({
-        session,
-        resolverName: 'user',
-        resolverType: 'Parent',
-      });
-      if (check?.auth) {
-        accountDataLoader.userLoader.clearAll();
-        return await accountDataLoader.userLoader.load(parent.userId);
-      }
-      return null;
+      accountDataLoader.userLoader.clearAll();
+      return await accountDataLoader.userLoader.load(parent.userId);
     },
   },
   Query: {
     accounts: async (parent, args, { db, session }) => {
-      const check = await checkSession({
-        session,
-        resolverName: 'accounts',
-        resolverType: 'Query',
-      });
-      if (check?.auth) {
-        return await db.account.findMany({});
-      }
-      return Error(check?.error);
+      return await db.account.findMany({});
     },
     account: async (parent, args, { db, session }) => {
-      const check = await checkSession({
-        session,
-        resolverName: 'account',
-        resolverType: 'Query',
+      return await db.account.findUnique({
+        where: {
+          id: args.id,
+        },
       });
-      if (check?.auth) {
-        return await db.account.findUnique({
-          where: {
-            id: args.id,
-          },
-        });
-      }
-      return Error(check?.error);
     },
   },
   Mutation: {
     createAccount: async (parent, args, { db, session }) => {
-      const check = await checkSession({
-        session,
-        resolverName: 'createAccount',
-        resolverType: 'Mutation',
+      return await db.account.create({
+        data: { ...args.data },
       });
-      if (check?.auth) {
-        return await db.account.create({
-          data: { ...args.data },
-        });
-      }
-      return Error(check?.error);
     },
     updateAccount: async (parent, args, { db, session }) => {
-      const check = await checkSession({
-        session,
-        resolverName: 'updateAccount',
-        resolverType: 'Mutation',
+      return await db.account.update({
+        where: {
+          id: args.where.id,
+        },
+        data: { ...args.data },
       });
-      if (check?.auth) {
-        return await db.account.update({
-          where: {
-            id: args.where.id,
-          },
-          data: { ...args.data },
-        });
-      }
-      return Error(check?.error);
     },
     upsertAccount: async (parent, args, { db, session }) => {
-      const check = await checkSession({
-        session,
-        resolverName: 'upsertAccount',
-        resolverType: 'Mutation',
+      return await db.account.upsert({
+        where: {
+          id: args.where.id,
+        },
+        create: { ...args.data },
+        update: { ...args.data },
       });
-      if (check?.auth) {
-        return await db.account.upsert({
-          where: {
-            id: args.where.id,
-          },
-          create: { ...args.data },
-          update: { ...args.data },
-        });
-      }
-      return Error(check?.error);
     },
 
     deleteAccount: async (parent, args, { db, session }) => {
-      const check = await checkSession({
-        session,
-        resolverName: 'deleteAccount',
-        resolverType: 'Mutation',
+      return await db.account.delete({
+        where: {
+          id: args.where.id,
+        },
       });
-      if (check?.auth) {
-        return await db.account.delete({
-          where: {
-            id: args.where.id,
-          },
-        });
-      }
-      return Error(check?.error);
     },
   },
 };
