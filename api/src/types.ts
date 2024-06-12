@@ -25,14 +25,18 @@ interface Context {
   session: Session;
 }
 
-interface ResolverFunction {
-  [key: string]: (parent: any, args: any, context: Context) => Promise<any>;
-}
+export type ResolverFunction = (parent: any, args: any, context: Context) => Promise<unknown>;
 
 interface Resolver {
-  Query: ResolverFunction;
-  Mutation: ResolverFunction;
-  [key: string]: ResolverFunction;
+  Query: { [key: string]: ResolverFunction };
+  Mutation: { [key: string]: ResolverFunction };
+  [key: string]: { [key: string]: ResolverFunction };
+}
+
+export enum Enum_ResolverType {
+  Query = 'Query',
+  Mutation = 'Mutation',
+  Parent = 'Parent',
 }
 
 export { Resolver, db, customEvent, Context };
