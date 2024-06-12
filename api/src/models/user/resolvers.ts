@@ -4,83 +4,36 @@ import { checkSession } from '@/auth/checkSession';
 import { changePassword, welcomeEmail } from '@/utils/emailTemplates';
 import { SendMail } from '@/utils/nodemailer';
 import { getSecretValueFunction } from '@/utils/getSecretValue';
-import {
-  createUserAuth0,
-  getAuth0Token,
-  resetPasswordAuth0,
-} from '@/utils/auth0';
+import { createUserAuth0, getAuth0Token, resetPasswordAuth0 } from '@/utils/auth0';
 import { nanoid } from 'nanoid';
 
-// Pendiente revisar
-const secretArn =
-  process.env.BACKEND_SECRETS ||
-  'arn:aws:secretsmanager:us-east-1:211125617130:secret:zoom-derick-derick-secrets-dev-snyMni';
+const secretArn = process.env.BACKEND_SECRETS || '';
 
 const userResolvers: Resolver = {
   User: {
     account: async (parent, args, { db, session }) => {
-      const check = await checkSession({
-        session,
-        resolverName: 'account',
-        resolverType: 'Parent',
-      });
-      if (check?.auth) {
-        userDataLoader.accountLoader.clearAll();
-        return await userDataLoader.accountLoader.load(parent.id);
-      }
-      return null;
+      userDataLoader.accountLoader.clearAll();
+      return await userDataLoader.accountLoader.load(parent.id);
     },
     sessions: async (parent, args, { db, session }) => {
-      const check = await checkSession({
-        session,
-        resolverName: 'sessions',
-        resolverType: 'Parent',
-      });
-      if (check?.auth) {
-        userDataLoader.sessionsLoader.clearAll();
-        return await userDataLoader.sessionsLoader.load(parent.id);
-      }
-      return null;
+      userDataLoader.sessionsLoader.clearAll();
+      return await userDataLoader.sessionsLoader.load(parent.id);
     },
     role: async (parent, args, { db, session }) => {
-      const check = await checkSession({
-        session,
-        resolverName: 'role',
-        resolverType: 'Parent',
-      });
-      if (check?.auth) {
-        userDataLoader.roleLoader.clearAll();
-        return await userDataLoader.roleLoader.load(parent.roleId);
-      }
-      return null;
+      userDataLoader.roleLoader.clearAll();
+      return await userDataLoader.roleLoader.load(parent.roleId);
     },
   },
   Query: {
     users: async (parent, args, { db, session }) => {
-      const check = await checkSession({
-        session,
-        resolverName: 'users',
-        resolverType: 'Query',
-      });
-      if (check?.auth) {
-        return await db.user.findMany({});
-      }
-      return Error(check?.error);
+      return await db.user.findMany({});
     },
     user: async (parent, args, { db, session }) => {
-      const check = await checkSession({
-        session,
-        resolverName: 'user',
-        resolverType: 'Query',
+      return await db.user.findUnique({
+        where: {
+          id: args.id,
+        },
       });
-      if (check?.auth) {
-        return await db.user.findUnique({
-          where: {
-            id: args.id,
-          },
-        });
-      }
-      return Error(check?.error);
     },
   },
   Mutation: {
@@ -98,8 +51,9 @@ const userResolvers: Resolver = {
       };
       try {
         // Get Auth0 token
-        const { access_token: accessToken, token_type: tokenType } =
-          await getAuth0Token(nextAuthCredentials).then((resToken) => resToken);
+        const { access_token: accessToken, token_type: tokenType } = await getAuth0Token(
+          nextAuthCredentials
+        ).then((resToken) => resToken);
 
         // Create user in Auth0
         const userData = await createUserAuth0(
@@ -138,9 +92,11 @@ const userResolvers: Resolver = {
     },
     changePassword: async (parent, args, { db }) => {
       try {
+        const nextAuthCredentials = await getSecretValueFunction(secretArn);
         // Obtener el token de autenticación de Auth0 utilizando una función asincrónica y desestructuración
-        const { access_token: accessToken, token_type: tokenType } =
-          await getAuth0Token().then((resToken) => resToken);
+        const { access_token: accessToken, token_type: tokenType } = await getAuth0Token(
+          nextAuthCredentials
+        ).then((resToken) => resToken);
 
         // Buscar el usuario en la base de datos utilizando el userId proporcionado en los argumentos
         const account = await db.account.findFirst({
@@ -158,22 +114,20 @@ const userResolvers: Resolver = {
         };
 
         // Llamar a la función para resetear la contraseña en Auth0 usando el token de autenticación
-        const resetPassword = await resetPasswordAuth0(
-          data,
-          accessToken,
-          tokenType
-        ).then((resAuth) => resAuth);
+        const resetPassword = await resetPasswordAuth0(data, accessToken, tokenType).then(
+          (resAuth) => resAuth
+        );
 
         // Si la respuesta del reseteo de contraseña contiene un ticket, enviar un correo electrónico al usuario
         if (resetPassword?.ticket) {
           // Obtener información del correo electrónico necesario para el cambio de contraseña
           const emailInfo = changePassword({
-            email: account?.user?.email, // Dirección de correo electrónico del usuario (aquí se puede cambiar por el correo del usuario real)
+            // email: account?.user?.email ?? '', // Dirección de correo electrónico del usuario (aquí se puede cambiar por el correo del usuario real)
             url: resetPassword?.ticket, // URL del ticket para cambiar la contraseña
           });
 
           // Enviar el correo electrónico utilizando una función SendMail (se asume que está definida en otra parte del código)
-          SendMail({ email: account?.user?.email, ...emailInfo }); // Aquí también se puede cambiar la dirección de correo por el del usuario real
+          SendMail({ email: account?.user?.email, ...emailInfo }, nextAuthCredentials); // Aquí también se puede cambiar la dirección de correo por el del usuario real
         }
 
         // Devolver un mensaje indicando que el envío del correo fue exitoso
@@ -205,45 +159,29 @@ const userResolvers: Resolver = {
       return Error(check?.error);
     },
     upsertUser: async (parent, args, { db, session }) => {
-      const check = await checkSession({
-        session,
-        resolverName: 'upsertUser',
-        resolverType: 'Mutation',
-      });
-      if (check?.auth) {
-        return await db.user.upsert({
-          where: {
-            id: args.where.id,
-          },
-          create: {
-            ...args.data,
+      return await db.user.upsert({
+        where: {
+          id: args.where.id,
+        },
+        create: {
+          ...args.data,
+          emailVerified: new Date(args.data.emailVerified).toISOString(),
+        },
+        update: {
+          ...args.data,
+          ...(args.data.emailVerified && {
             emailVerified: new Date(args.data.emailVerified).toISOString(),
-          },
-          update: {
-            ...args.data,
-            ...(args.data.emailVerified && {
-              emailVerified: new Date(args.data.emailVerified).toISOString(),
-            }),
-          },
-        });
-      }
-      return Error(check?.error);
+          }),
+        },
+      });
     },
 
     deleteUser: async (parent, args, { db, session }) => {
-      const check = await checkSession({
-        session,
-        resolverName: 'deleteUser',
-        resolverType: 'Mutation',
+      return await db.user.delete({
+        where: {
+          id: args.where.id,
+        },
       });
-      if (check?.auth) {
-        return await db.user.delete({
-          where: {
-            id: args.where.id,
-          },
-        });
-      }
-      return Error(check?.error);
     },
   },
 };
