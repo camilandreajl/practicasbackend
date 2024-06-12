@@ -1,4 +1,6 @@
-const getSession = async (db: any, sessionToken: any) => {
+import { db } from '@/types';
+
+const getSession = async (db: db, sessionToken: string | undefined) => {
   const session = await db.session.findFirst({
     where: { sessionToken: sessionToken ?? '' },
     select: {
@@ -6,10 +8,14 @@ const getSession = async (db: any, sessionToken: any) => {
       user: {
         select: {
           role: true,
+          id: true,
         },
       },
     },
   });
+  if (!session) {
+    throw new Error('Session not found');
+  }
   return session;
 };
 

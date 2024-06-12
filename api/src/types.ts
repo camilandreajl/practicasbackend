@@ -1,33 +1,28 @@
-import { Prisma, PrismaClient, Role, Session, User } from '@prisma/client';
+import { Enum_RoleName, PrismaClient } from '@prisma/client';
 import type { APIGatewayProxyEvent } from 'aws-lambda';
 
-type db = PrismaClient<
-  Prisma.PrismaClientOptions,
-  never,
-  Prisma.RejectOnNotFound | Prisma.RejectPerOperation | undefined
->;
+type db = PrismaClient;
 
 interface customEvent extends APIGatewayProxyEvent {
-  session:
-    | (Session & {
-        user: User & {
-          role: Role | null;
-        };
-      })
-    | null;
+  session: Session;
 }
+
+export type Session = {
+  expires: Date;
+  user: {
+    id: string;
+    role: {
+      id: string;
+      name: Enum_RoleName;
+      createdAt: Date;
+      updatedAt: Date;
+    };
+  };
+} | null;
 
 interface Context {
   db: db;
-  // sessionToken: string | undefined;
-  // user: (User & { role: Role | null }) | undefined;
-  session:
-    | (Session & {
-        user: User & {
-          role: Role | null;
-        };
-      })
-    | null;
+  session: Session;
 }
 
 interface ResolverFunction {
