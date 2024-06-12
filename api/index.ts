@@ -9,6 +9,7 @@ import { getDB } from './src/db';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { getSession } from './src/auth/getSession';
 import { resolverArray, typesArray } from './src/models';
+import { Context } from '@/types';
 
 // Required logic for integrating with Express
 const app = express();
@@ -22,7 +23,7 @@ const schema = makeExecutableSchema({
   resolvers: resolverArray,
 });
 
-export const server = new ApolloServer({
+export const server = new ApolloServer<Context>({
   schema: schema,
   plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
 });
@@ -42,10 +43,10 @@ const main = async () => {
     // an Apollo Server instance and optional configuration options
     expressMiddleware(server, {
       context: async ({ req }) => {
-        const sessionToken: string | string[] | undefined = req.headers['next-auth.session-token'];
         const db = await getDB();
-        const { user, session } = await getSession(db, sessionToken);
-        return { db, user, session };
+        const sessionToken: string | string[] | undefined = req.headers['next-auth.session-token'];
+        const session = await getSession(db, sessionToken as string);
+        return { db, session };
       },
     })
   );
