@@ -1,6 +1,14 @@
 import gql from 'graphql-tag';
 
 export const generalTypes = gql`
+  directive @client_metadata(
+    name: String
+    filterable: Boolean = false
+    orderable: Boolean = false
+    searchable: Boolean = false
+    hidden: Boolean = false
+  ) on FIELD
+
   scalar Date
 
   input StringFilter {
@@ -31,6 +39,7 @@ export const generalTypes = gql`
   }
 
   type Query {
-    getSignedUrlForPutObject(key: String!): String!
+    getSignedUrlForUpload(file: String): PresignedURL
+    getMultipleSignedUrlsForUpload(files: [String]): [PresignedURL]
   }
 `;
