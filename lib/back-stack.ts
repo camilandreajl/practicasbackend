@@ -17,7 +17,7 @@ export class BackStack extends Stack {
     this.deployEnvironment = env || Environment.DEV;
 
     const dbSecret = new SecretsManager(this, `${id}-dbSecret`).buildSecretManager(
-      'dbSecret',
+      `${id}-dbSecret`,
       'secret to keep db credentials',
       true
     );
@@ -25,7 +25,7 @@ export class BackStack extends Stack {
     const applicationSecret = new SecretsManager(
       this,
       `${id}-applicationSecret`
-    ).buildSecretManager('applicationSecret', 'secret to keep environment variables', false);
+    ).buildSecretManager(`${id}-applicationSecret`, 'secret to keep environment variables', false);
 
     const vpc = new VPC(this, `${id}-vpc`).buildVPC(this.deployEnvironment);
 
