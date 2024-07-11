@@ -26,19 +26,19 @@ Dependiendo del entorno al que quieras desplegar, utiliza uno de los siguientes 
 Para desplegar en desarrollo:
 
 ```bash
-yarn deploy:dev
+bun deploy:dev
 ```
 
 Para desplegar en producción:
 
 ```bash
-yarn deploy:prod
+bun deploy:prod
 ```
 
 Para desplegar en todos los entornos:
 
 ```bash
-yarn deploy:all
+bun deploy:all
 ```
 
 ### Paso 3: Instalación de dependencias en la raiz del proyecto
