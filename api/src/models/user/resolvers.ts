@@ -4,7 +4,11 @@ import { checkSession } from '@/auth/checkSession';
 import { changePassword, welcomeEmail } from '@/utils/emailTemplates';
 import { SendMail } from '@/utils/nodemailer';
 import { getSecretValueFunction } from '@/utils/getSecretValue';
-import { createUserAuth0, getAuth0Token, resetPasswordAuth0 } from '@/utils/auth0';
+import {
+  createUserAuth0,
+  getAuth0Token,
+  resetPasswordAuth0,
+} from '@/utils/auth0';
 import { nanoid } from 'nanoid';
 
 const secretArn = process.env.BACKEND_SECRETS || '';
@@ -51,9 +55,8 @@ const userResolvers: Resolver = {
       };
       try {
         // Get Auth0 token
-        const { access_token: accessToken, token_type: tokenType } = await getAuth0Token(
-          nextAuthCredentials
-        ).then((resToken) => resToken);
+        const { access_token: accessToken, token_type: tokenType } =
+          await getAuth0Token(nextAuthCredentials).then((resToken) => resToken);
 
         // Create user in Auth0
         const userData = await createUserAuth0(
@@ -94,9 +97,8 @@ const userResolvers: Resolver = {
       try {
         const nextAuthCredentials = await getSecretValueFunction(secretArn);
         // Obtener el token de autenticación de Auth0 utilizando una función asincrónica y desestructuración
-        const { access_token: accessToken, token_type: tokenType } = await getAuth0Token(
-          nextAuthCredentials
-        ).then((resToken) => resToken);
+        const { access_token: accessToken, token_type: tokenType } =
+          await getAuth0Token(nextAuthCredentials).then((resToken) => resToken);
 
         // Buscar el usuario en la base de datos utilizando el userId proporcionado en los argumentos
         const account = await db.account.findFirst({
@@ -114,9 +116,11 @@ const userResolvers: Resolver = {
         };
 
         // Llamar a la función para resetear la contraseña en Auth0 usando el token de autenticación
-        const resetPassword = await resetPasswordAuth0(data, accessToken, tokenType).then(
-          (resAuth) => resAuth
-        );
+        const resetPassword = await resetPasswordAuth0(
+          data,
+          accessToken,
+          tokenType
+        ).then((resAuth) => resAuth);
 
         // Si la respuesta del reseteo de contraseña contiene un ticket, enviar un correo electrónico al usuario
         if (resetPassword?.ticket) {
@@ -127,7 +131,10 @@ const userResolvers: Resolver = {
           });
 
           // Enviar el correo electrónico utilizando una función SendMail (se asume que está definida en otra parte del código)
-          SendMail({ email: account?.user?.email, ...emailInfo }, nextAuthCredentials); // Aquí también se puede cambiar la dirección de correo por el del usuario real
+          SendMail(
+            { email: account?.user?.email, ...emailInfo },
+            nextAuthCredentials
+          ); // Aquí también se puede cambiar la dirección de correo por el del usuario real
         }
 
         // Devolver un mensaje indicando que el envío del correo fue exitoso
