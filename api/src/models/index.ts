@@ -42,6 +42,12 @@ const resolverArray = [
   return el;
 });
 
-const typesArray = [generalTypes, accountTypes, sessionTypes, userTypes, roleTypes];
+const typesArray = [
+  generalTypes,
+  accountTypes,
+  sessionTypes,
+  userTypes,
+  roleTypes,
+];
 
 export { resolverArray, typesArray };

@@ -25,7 +25,11 @@ interface Context {
   session: Session;
 }
 
-export type ResolverFunction = (parent: any, args: any, context: Context) => Promise<unknown>;
+export type ResolverFunction = (
+  parent: any,
+  args: any,
+  context: Context
+) => Promise<unknown>;
 
 interface Resolver {
   Query: { [key: string]: ResolverFunction };

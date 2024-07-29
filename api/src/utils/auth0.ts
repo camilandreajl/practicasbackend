@@ -15,7 +15,11 @@ interface NextAuthCredentials {
   EMAIL_HOST: string;
 }
 
-const makePost = async (url: string, body: any, options: RequestOptions = {}): Promise<any> => {
+const makePost = async (
+  url: string,
+  body: any,
+  options: RequestOptions = {}
+): Promise<any> => {
   const headers: Record<string, string> = options.headers || {};
   const response = await fetch(url, { body, headers, method: 'POST' });
 
@@ -25,7 +29,11 @@ const makePost = async (url: string, body: any, options: RequestOptions = {}): P
   return response.json();
 };
 
-const makeJSONPost = async (url: string, data: any, options: RequestOptions = {}): Promise<any> => {
+const makeJSONPost = async (
+  url: string,
+  data: any,
+  options: RequestOptions = {}
+): Promise<any> => {
   const body = JSON.stringify(data);
   const headers: Record<string, string> = options.headers || {};
   headers['Content-Type'] = 'application/json';
@@ -33,7 +41,9 @@ const makeJSONPost = async (url: string, data: any, options: RequestOptions = {}
   return makePost(url, body, { headers });
 };
 
-export const getAuth0Token = async (data: NextAuthCredentials): Promise<any> => {
+export const getAuth0Token = async (
+  data: NextAuthCredentials
+): Promise<any> => {
   try {
     const url = `https://${data?.AUTH0_DOMAIN || process.env.AUTH0_DOMAIN}/oauth/token`;
     const headers: Record<string, string> = {};
@@ -41,7 +51,8 @@ export const getAuth0Token = async (data: NextAuthCredentials): Promise<any> => 
 
     const body = {
       client_id: data?.AUTH0_CLIENT_ID || process.env.AUTH0_CLIENT_ID,
-      client_secret: data?.AUTH0_CLIENT_SECRET || process.env.AUTH0_CLIENT_SECRET,
+      client_secret:
+        data?.AUTH0_CLIENT_SECRET || process.env.AUTH0_CLIENT_SECRET,
       audience: `https://${data?.AUTH0_DOMAIN || process.env.AUTH0_DOMAIN}/api/v2/`,
       grant_type: 'client_credentials',
     };
@@ -71,7 +82,11 @@ export const createUserAuth0 = (
   }
 };
 
-export const resetPasswordAuth0 = (data: any, token: string, tokenType: string): Promise<any> => {
+export const resetPasswordAuth0 = (
+  data: any,
+  token: string,
+  tokenType: string
+): Promise<any> => {
   const url = `https://${process.env.AUTH0_DOMAIN}/api/v2/tickets/password-change`;
   const headers: Record<string, string> = {
     Authorization: `${tokenType} ${token}`,

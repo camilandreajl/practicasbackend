@@ -1,6 +1,5 @@
 import { Resolver } from '@/types';
 import { accountDataLoader } from './dataLoaders';
-import { checkSession } from '@/auth/checkSession';
 
 const accountResolvers: Resolver = {
   Account: {
