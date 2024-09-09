@@ -38,6 +38,11 @@ export const generalTypes = gql`
     desc # Descending order
   }
 
+  type PresignedURL {
+    fileName: String
+    url: String
+  }
+
   type Query {
     getSignedUrlForUpload(file: String): PresignedURL
     getMultipleSignedUrlsForUpload(files: [String]): [PresignedURL]
