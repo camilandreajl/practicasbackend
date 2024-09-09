@@ -37,6 +37,7 @@ export class Lambda extends Construct {
         AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
         BUCKET_NAME: bucket?.bucketName || '',
         APPLICATION_SECRETS_ID: applicationSecrets?.secretArn || '',
+        DEPLOYENVIRONMENT: environment || '',
       },
     });
     if (cluster) {

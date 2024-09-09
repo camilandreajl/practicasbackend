@@ -5,6 +5,7 @@ import {
 } from '@aws-sdk/client-secrets-manager';
 
 const sm = new SecretsManagerClient({ region: 'us-east-1' });
+const environment = process.env.DEPLOYENVIRONMENT || 'dev';
 
 let db: PrismaClient;
 export const getDB = async () => {
@@ -20,7 +21,7 @@ export const getDB = async () => {
 
     const secretString = JSON.parse(dbURL.SecretString || '{}');
 
-    url = `postgresql://${secretString.username}:${secretString.password}@${secretString.host}:${secretString.port}/${secretString.dbname}?schema=dev`;
+    url = `postgresql://${secretString.username}:${secretString.password}@${secretString.host}:${secretString.port}/${secretString.dbname}?schema=${environment}`;
   } catch (e) {
     // eslint-disable-next-line no-console
     console.log('Error getting secret', e);

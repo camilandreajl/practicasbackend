@@ -40,7 +40,8 @@ export class BackStack extends Stack {
     const lambda = new Lambda(this, `${id}-lambda`).buildServerLambda(
       cluster,
       privateBucket,
-      applicationSecret
+      applicationSecret,
+      this.deployEnvironment
     );
 
     const apiGateway = new APIGateway(this, `${id}-apiGateway`).buildApiGateway(
