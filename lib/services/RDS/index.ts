@@ -21,7 +21,7 @@ export class RDS extends Construct {
     deployEnvironment: string
   ) {
     const project = PROJECT.toLowerCase().replace(/-/g, '_');
-    const identifier = `${CUSTOMER.toLowerCase()}-${project}-db-${deployEnvironment}`;
+    const identifier = `${CUSTOMER.toLowerCase()}-${PROJECT}-db-${deployEnvironment}`;
 
     const cluster = new rds.DatabaseInstance(this, identifier, {
       engine: rds.DatabaseInstanceEngine.postgres({
