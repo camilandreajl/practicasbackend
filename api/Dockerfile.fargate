@@ -20,6 +20,7 @@ RUN npx prisma generate
 
 # Build the client
 RUN npm run build
+RUN npm run cosmo
 
 # RUN cp -r ./graphql ./dist
 
