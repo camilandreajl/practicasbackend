@@ -8,8 +8,8 @@
     "seed": "ts-node prisma/seed.ts"
   },
   "scripts": {
-    "generate_build": "cosmo && npx prisma generate && prettier --config .prettierrc prisma/generated/graphql/**/*.ts --write && next build",
-    "cosmo": "cosmo && prettier --config .prettierrc prisma/generated/graphql/**/*.ts --write",
+    "generate_build": "cosmo && npx prisma generate && prettier --config .prettierrc prisma/generated/**/*.ts --write && next build",
+    "cosmo": "cosmo && prettier --config .prettierrc prisma/generated/**/*.ts --write",
     "generate": "npx prisma generate && bun run cosmo",
     "compile": "rimraf ./dist && tsc",
     "build": "esbuild index.ts --bundle --minify --sourcemap --platform=node --target=es2020 --outfile=dist/index.js",
