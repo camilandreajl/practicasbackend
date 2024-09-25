@@ -1,4 +1,4 @@
-import { Enum_RoleName, PrismaClient } from '@prisma/client';
+import { PrismaClient, Role } from '@prisma/client';
 import type { APIGatewayProxyEvent } from 'aws-lambda';
 
 type db = PrismaClient;
@@ -11,12 +11,7 @@ export type Session = {
   expires: Date;
   user: {
     id: string;
-    role: {
-      id: string;
-      name: Enum_RoleName;
-      createdAt: Date;
-      updatedAt: Date;
-    };
+    role: Role;
   };
 } | null;
 
@@ -25,11 +20,7 @@ interface Context {
   session: Session;
 }
 
-export type ResolverFunction = (
-  parent: any,
-  args: any,
-  context: Context
-) => Promise<unknown>;
+export type ResolverFunction = (parent: any, args: any, context: Context) => Promise<unknown>;
 
 interface Resolver {
   Query: { [key: string]: ResolverFunction };

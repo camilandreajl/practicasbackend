@@ -16,8 +16,7 @@ FROM public.ecr.aws/lambda/nodejs:18
 WORKDIR ${LAMBDA_TASK_ROOT}
 COPY --from=builder /usr/app/package.json ./
 COPY --from=builder /usr/app/dist/* ./
-COPY --from=builder /usr/app/prisma/* ./prisma/
+COPY --from=builder /usr/app/prisma ./prisma
 RUN npm install
-RUN npx prisma generate
 
 CMD ["index.handler"]
