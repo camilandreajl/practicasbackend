@@ -12,6 +12,10 @@ import { userTypes } from './user/types';
 import { roleTypes } from './role/types';
 import { Enum_ResolverType, Resolver } from '@/types';
 import { withSessionCheck } from '@/auth/withSessionCheck';
+import {
+  resolverArray as cosmoResolvers,
+  typesArray as cosmoTypes,
+} from 'prisma/generated/models';
 
 const resolverArray = [
   generalResolvers,
@@ -19,6 +23,7 @@ const resolverArray = [
   sessionResolvers,
   userResolvers,
   roleResolvers,
+  ...cosmoResolvers,
 ].map((el) => {
   const mappedResolver: Resolver = { Query: {}, Mutation: {} };
 
@@ -48,6 +53,7 @@ const typesArray = [
   sessionTypes,
   userTypes,
   roleTypes,
+  ...cosmoTypes,
 ];
 
 export { resolverArray, typesArray };
