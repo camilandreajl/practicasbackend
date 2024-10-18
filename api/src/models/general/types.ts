@@ -45,6 +45,7 @@ export const generalTypes = gql`
 
   type Query {
     getSignedUrlForUpload(file: String): PresignedURL
+    getSignedUrlsForFolder(folderPath: String): [PresignedURL]
     getMultipleSignedUrlsForUpload(files: [String]): [PresignedURL]
   }
 `;

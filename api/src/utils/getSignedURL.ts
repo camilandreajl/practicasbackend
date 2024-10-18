@@ -1,5 +1,6 @@
 import {
   GetObjectCommand,
+  ListObjectsV2Command,
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
@@ -29,6 +30,45 @@ export const getSignedUrlFromS3 = async (
   });
 
   return signedUrl;
+};
+
+export const getSignedUrlsForFolder = async (
+  folderPath: string
+): Promise<{ url: string; fileName: string }[]> => {
+  const Bucket = await getBucketName();
+  const listCommand = new ListObjectsV2Command({
+    Bucket,
+    Prefix: folderPath.endsWith('/') ? folderPath : `${folderPath}/`,
+  });
+
+  const { Contents } = await s3Client.send(listCommand);
+  if (!Contents) {
+    return [];
+  }
+
+  const signedUrls = await Promise.all(
+    Contents.map(async (item) => {
+      const isValidKey =
+        item.Key && item.Key !== folderPath && item.Key !== `${folderPath}/`;
+      if (isValidKey) {
+        const command = new GetObjectCommand({
+          Bucket,
+          Key: item.Key,
+        });
+
+        const signedUrl = await getSignedUrl(s3Client, command, {
+          expiresIn: READ_EXPIRATION_SECONDS,
+        });
+
+        const fileName = item.Key ? item.Key.split('/').pop() || '' : '';
+
+        return { url: signedUrl, fileName };
+      }
+      return { url: '', fileName: '' };
+    })
+  );
+
+  return signedUrls.filter(({ url }) => url !== '');
 };
 
 export const getSignedUrlForUpload = async (path: string): Promise<string> => {
