@@ -16,8 +16,8 @@ const generalResolvers: Resolver = {
       const { folderPath } = args;
       const signedUrls = await getSignedUrlsForFolder(folderPath);
 
-      return signedUrls.map((url, index) => ({
-        fileName: `file_${index}`,
+      return signedUrls.map(({ url, fileName }) => ({
+        fileName,
         url,
       }));
     },

@@ -34,7 +34,7 @@ export const getSignedUrlFromS3 = async (
 
 export const getSignedUrlsForFolder = async (
   folderPath: string
-): Promise<string[]> => {
+): Promise<{ url: string; fileName: string }[]> => {
   const Bucket = await getBucketName();
   const listCommand = new ListObjectsV2Command({
     Bucket,
@@ -56,15 +56,19 @@ export const getSignedUrlsForFolder = async (
           Key: item.Key,
         });
 
-        return getSignedUrl(s3Client, command, {
+        const signedUrl = await getSignedUrl(s3Client, command, {
           expiresIn: READ_EXPIRATION_SECONDS,
         });
+
+        const fileName = item.Key ? item.Key.split('/').pop() || '' : '';
+
+        return { url: signedUrl, fileName };
       }
-      return '';
+      return { url: '', fileName: '' };
     })
   );
 
-  return signedUrls.filter((url) => url !== '');
+  return signedUrls.filter(({ url }) => url !== '');
 };
 
 export const getSignedUrlForUpload = async (path: string): Promise<string> => {
