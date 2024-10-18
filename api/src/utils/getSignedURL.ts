@@ -48,7 +48,8 @@ export const getSignedUrlsForFolder = async (
 
   const signedUrls = await Promise.all(
     Contents.map(async (item) => {
-      const isValidKey = item.Key && item.Key !== folderPath && item.Key !== `${folderPath}/`;
+      const isValidKey =
+        item.Key && item.Key !== folderPath && item.Key !== `${folderPath}/`;
       if (isValidKey) {
         const command = new GetObjectCommand({
           Bucket,
