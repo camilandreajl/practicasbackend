@@ -27,12 +27,16 @@ export class BackStack extends Stack {
       `${id}-applicationSecret`
     ).buildSecretManager(`${id}-applicationSecret`, 'secret to keep environment variables', false);
 
-    const vpc = new VPC(this, `${id}-vpc`).buildVPC(this.deployEnvironment);
+    // Crear cluster de base de datos solo si el entorno es diferente de test
+    let cluster = undefined;
+    if (this.deployEnvironment !== 'test') {
+      const vpc = new VPC(this, `${id}-vpc`).buildVPC(this.deployEnvironment);
+      const rds = new RDS(this, `${id}-rds`);
+      const securityGroup = rds.buildDatabaseSecurityGroup(vpc, this.deployEnvironment);
+      cluster = rds.buildDatabase(vpc, securityGroup, dbSecret, this.deployEnvironment);
+    }
 
-    const rds = new RDS(this, `${id}-rds`);
-    const securityGroup = rds.buildDatabaseSecurityGroup(vpc, this.deployEnvironment);
-    const cluster = rds.buildDatabase(vpc, securityGroup, dbSecret, this.deployEnvironment);
-
+    // Creando buckets públicos y privado y encontrando cual es el privado
     const s3 = new S3(this, `${id}-s3`);
     const buckets = s3.buildS3Array(BUCKETS, this.deployEnvironment);
     const privateBucket = buckets.find((bucket) => !bucket.isPublic)?.bucket;
@@ -40,6 +44,7 @@ export class BackStack extends Stack {
     const lambda = new Lambda(this, `${id}-lambda`).buildServerLambda(
       cluster,
       privateBucket,
+      dbSecret,
       applicationSecret,
       this.deployEnvironment
     );

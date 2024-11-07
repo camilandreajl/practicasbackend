@@ -45,11 +45,32 @@ export class CodePipeline extends Construct {
     secret: cdk.aws_secretsmanager.Secret,
     env: Environment
   ) {
+    let autoDeleteObjects;
+    let branch;
+    let command;
+
+    switch (env) {
+      case Environment.DEV:
+        branch = 'dev';
+        command = 'dev';
+        autoDeleteObjects = true;
+        break;
+      case Environment.TEST:
+        branch = 'test';
+        command = 'test';
+        autoDeleteObjects = true;
+        break;
+      case Environment.PROD:
+        branch = 'main';
+        command = 'prod';
+        autoDeleteObjects = false;
+        break;
+    }
     const pipelineArtifactBucket = new s3.Bucket(this, `PipelineArtifactBucket${env}`, {
       bucketName: `${PROJECT}-ci-cd-artifact-bucket-${env}`.toLowerCase(),
       removalPolicy:
         env === Environment.PROD ? cdk.RemovalPolicy.RETAIN : cdk.RemovalPolicy.DESTROY, // Or DESTROY for dev environments
-      autoDeleteObjects: env === Environment.DEV, // Set to true for dev environments
+      autoDeleteObjects: autoDeleteObjects,
     });
 
     // artefacto para guardar el código fuente que se va a desplegar. Es output de el stage de GitHub e input del resto de stages.
@@ -60,7 +81,7 @@ export class CodePipeline extends Construct {
       actionName: 'GitHubAccess',
       owner: 'prevalentWare',
       repo: REPO,
-      branch: env === Environment.PROD ? 'main' : 'dev',
+      branch: branch,
       oauthToken: secret.secretValue,
       output: pipelineSourceArtifact,
     });
@@ -149,7 +170,8 @@ export class CodePipeline extends Construct {
             build: {
               commands: [
                 'echo Desplegando el aplicativo...',
-                `bun run deploy:${env === Environment.PROD ? 'prod' : 'dev'}`,
+                // `bun run deploy:${env === Environment.PROD ? 'prod' : 'dev'}`,
+                `bun run deploy:${command}`,
               ],
             },
           },

@@ -16,15 +16,24 @@ const backStackDev = new BackStack(
   Environment.DEV
 );
 
-// const backStackProd = new BackStack(
-//   app,
-//   `${CUSTOMER}-${APP_NAME}-stack-${Environment.PROD}`,
-//   {
-//     env: { account: ACCOUNT, region: REGION },
-//   },
-//   Environment.PROD
-// );
+const backStackTest = new BackStack(
+  app,
+  `${CUSTOMER}-${APP_NAME}-stack-${Environment.TEST}`,
+  {
+    env: { account: ACCOUNT, region: REGION },
+  },
+  Environment.TEST
+);
 
-// const pipelineStack = new PipelineStack(app, `${CUSTOMER}-${APP_NAME}-cicd`, {
-//   env: { account: ACCOUNT, region: REGION },
-// });
+const backStackProd = new BackStack(
+  app,
+  `${CUSTOMER}-${APP_NAME}-stack-${Environment.PROD}`,
+  {
+    env: { account: ACCOUNT, region: REGION },
+  },
+  Environment.PROD
+);
+
+const pipelineStack = new PipelineStack(app, `${CUSTOMER}-${APP_NAME}-cicd`, {
+  env: { account: ACCOUNT, region: REGION },
+});

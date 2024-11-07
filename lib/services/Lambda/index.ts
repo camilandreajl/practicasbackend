@@ -21,6 +21,7 @@ export class Lambda extends Construct {
   buildServerLambda(
     cluster?: rds.DatabaseInstance,
     bucket?: s3.Bucket,
+    dbSecret?: secretsManager.Secret,
     applicationSecrets?: secretsManager.Secret,
     environment?: Environment
   ) {
@@ -33,7 +34,7 @@ export class Lambda extends Construct {
       memorySize: 1024,
       timeout: Duration.seconds(60),
       environment: {
-        SECRET_ID: cluster?.secret?.secretArn || '',
+        SECRET_ID: dbSecret?.secretArn || '',
         AWS_NODEJS_CONNECTION_REUSE_ENABLED: '1',
         BUCKET_NAME: bucket?.bucketName || '',
         APPLICATION_SECRETS_ID: applicationSecrets?.secretArn || '',

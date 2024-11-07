@@ -24,6 +24,9 @@ export class PipelineStack extends cdk.Stack {
     // construir el pipeline de DEV
     pipeLine.buildPipeline(role, pipeLineSecret, Environment.DEV);
 
+    // construir el pipeline de TEST
+    pipeLine.buildPipeline(role, pipeLineSecret, Environment.TEST);
+
     // construir el pipeline de PROD
     pipeLine.buildPipeline(role, pipeLineSecret, Environment.PROD);
   }
