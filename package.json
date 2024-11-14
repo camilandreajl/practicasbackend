@@ -11,8 +11,9 @@
     "cdk": "cdk",
     "deploy:all": "bun run clean && bun run build && bun run cdk deploy --all",
     "deploy:dev": "bun run clean && bun run build && bun run cdk deploy prevalentware-boilerplate-stack-dev --require-approval never",
+    "deploy:test": "bun run clean && bun run build && bun run cdk deploy prevalentware-boilerplate-stack-test --require-approval never",
     "deploy:prod": "bun run clean && bun run build && bun run cdk deploy prevalentware-boilerplate-stack-prod --require-approval never",
-    "deploy:pipeline": "bun run clean && bun run build && bun run cdk deploy prevalentware-boilerplate-cicd",
+    "deploy:pipeline": "bun run clean && bun run build && bun run cdk deploy prevalentware-boilerplate-stack-cicd",
     "destroy": "bun run cdk destroy",
     "synth": "bun run cdk synth > template.yaml"
   },
