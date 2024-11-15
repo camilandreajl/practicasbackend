@@ -29,7 +29,7 @@ export class BackStack extends Stack {
 
     // Crear cluster de base de datos solo si el entorno es diferente de test
     let cluster = undefined;
-    if (this.deployEnvironment !== 'test') {
+    if (this.deployEnvironment !== Environment.TEST) {
       const vpc = new VPC(this, `${id}-vpc`).buildVPC(this.deployEnvironment);
       const rds = new RDS(this, `${id}-rds`);
       const securityGroup = rds.buildDatabaseSecurityGroup(vpc, this.deployEnvironment);
