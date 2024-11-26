@@ -10,6 +10,7 @@
   "scripts": {
     "generate_build": "cosmo && npx prisma generate && prettier --config .prettierrc prisma/generated/**/*.ts --write && next build",
     "cosmo": "cosmo && prettier --config .prettierrc prisma/generated/**/*.ts --write",
+    "cosmo:deploy": "bunx prisma generate && cosmo",
     "generate": "npx prisma generate && bun run cosmo",
     "compile": "rimraf ./dist && tsc",
     "build": "esbuild index.ts --bundle --minify --sourcemap --platform=node --target=es2020 --outfile=dist/index.js",
