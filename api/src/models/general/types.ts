@@ -1,12 +1,17 @@
 import gql from 'graphql-tag';
 
 export const generalTypes = gql`
+  scalar DateTime
+  scalar Date
+  scalar JSON
+
   directive @client_metadata(
     name: String
     filterable: Boolean = false
     orderable: Boolean = false
     searchable: Boolean = false
     hidden: Boolean = false
+    exportable: Boolean = true
   ) on FIELD
 
   scalar Date
@@ -43,9 +48,25 @@ export const generalTypes = gql`
     url: String
   }
 
+  input ExcelHeaderInput {
+    key: String!
+    title: String!
+  }
+
+  type ExcelExportResponse {
+    url: String!
+    message: String!
+    error: Boolean!
+  }
+
   type Query {
     getSignedUrlForUpload(file: String): PresignedURL
     getSignedUrlsForFolder(folderPath: String): [PresignedURL]
     getMultipleSignedUrlsForUpload(files: [String]): [PresignedURL]
+    exportDataAsExcel(
+      headers: [ExcelHeaderInput!]!
+      data: JSON!
+      path: String!
+    ): ExcelExportResponse!
   }
 `;

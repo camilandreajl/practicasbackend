@@ -1,4 +1,5 @@
 import { Resolver } from '@/types';
+import { createExcel, ExcelData } from '@/utils/createExcel';
 import {
   getSignedUrlForUpload,
   getSignedUrlsForFolder,
@@ -28,6 +29,9 @@ const generalResolvers: Resolver = {
           url: await getSignedUrlForUpload(file),
         }))
       );
+    },
+    exportDataAsExcel: async (parent, args: ExcelData) => {
+      return await createExcel({ ...args });
     },
   },
   Mutation: {},
