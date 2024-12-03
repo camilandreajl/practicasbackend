@@ -42,5 +42,10 @@ export const sessionConfig = {
     // Role
     { name: 'roles', roles: ['Admin'], isPublic: false },
     { name: 'role', roles: ['Admin'], isPublic: false },
+    // Export Data As Excel
+    {
+      name: 'exportDataAsExcel',
+      roles: ['Admin'],
+    },
   ],
 };
