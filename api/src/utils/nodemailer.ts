@@ -1,6 +1,6 @@
 import nodemailer from 'nodemailer';
 
-export const SendMail = (data: any, nextAuthCredentials: any) => {
+export const SendMail = async (data: any, nextAuthCredentials: any) => {
   const { email } = data;
   try {
     const transporter = nodemailer.createTransport({
@@ -21,7 +21,7 @@ export const SendMail = (data: any, nextAuthCredentials: any) => {
       html: data.template,
     };
 
-    transporter.sendMail(message);
+    const result = await transporter.sendMail(message);
   } catch (error) {
     return Error(error as string);
   }
