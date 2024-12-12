@@ -22,9 +22,8 @@ export const SendMail = async (data: any, nextAuthCredentials: any) => {
     };
 
     const result = await transporter.sendMail(message);
+    return result;
   } catch (error) {
     return Error(error as string);
   }
-
-  return null;
 };
