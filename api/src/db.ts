@@ -11,21 +11,22 @@ let db: PrismaClient;
 export const getDB = async () => {
   if (db) return db;
 
-  let url = process.env.DATABASE_URL || 'no env variable found';
-  try {
-    const getSecretValueCommand = new GetSecretValueCommand({
-      SecretId: process.env.SECRET_ID || '',
-    });
+  const url = process.env.DATABASE_URL || 'no env variable found';
+  console.log('url', url);
+  // try {
+  //   const getSecretValueCommand = new GetSecretValueCommand({
+  //     SecretId: process.env.SECRET_ID || '',
+  //   });
 
-    const dbURL = await sm.send(getSecretValueCommand);
+  //   const dbURL = await sm.send(getSecretValueCommand);
 
-    const secretString = JSON.parse(dbURL.SecretString || '{}');
+  //   const secretString = JSON.parse(dbURL.SecretString || '{}');
 
-    url = `postgresql://${secretString.username}:${secretString.password}@${secretString.host}:${secretString.port}/${secretString.dbname}?schema=${environment}`;
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.log('Error getting secret', e);
-  }
+  //   url = `postgresql://${secretString.username}:${secretString.password}@${secretString.host}:${secretString.port}/${secretString.dbname}?schema=${environment}`;
+  // } catch (e) {
+  //   // eslint-disable-next-line no-console
+  //   console.log('Error getting secret', e);
+  // }
 
   db = new PrismaClient({ datasources: { db: { url } } });
   return db;

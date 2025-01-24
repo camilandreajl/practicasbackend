@@ -8,8 +8,9 @@ import bodyParser from 'body-parser';
 import { getDB } from './src/db';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { getSession } from './src/auth/getSession';
-import { resolverArray, typesArray } from './src/models';
 import { Context } from '@/types';
+import { resolverArray } from '@/models';
+import { typesArray } from '@/models';
 
 // Required logic for integrating with Express
 const app = express();

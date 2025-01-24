@@ -9,35 +9,12 @@ datasource db {
 
 // Modelos basicos para autenticacion auth0
 
-enum Enum_RoleName {
-    Admin
-    SuperAdmin
-}
-
-model Account {
-    id                 String  @id @default(cuid())
-    type               String
-    provider           String
-    providerAccountId  String
-    refresh_token      String?
-    access_token       String?
-    expires_at         Int?
-    token_type         String?
-    scope              String?
-    id_token           String?
-    session_state      String?
-    oauth_token_secret String?
-    oauth_token        String?
-    userId             String  @unique
-    user               User    @relation(fields: [userId], references: [id])
-
-    @@unique([provider, providerAccountId])
-}
 
 model Session {
     id           String   @id @default(cuid())
     sessionToken String   @unique
-    expires      DateTime
+    expires      DateTime?
+    createdAt    DateTime @default(now())
     userId       String
     user         User     @relation(fields: [userId], references: [id])
 }
@@ -45,18 +22,28 @@ model Session {
 model User {
     id             String    @id @default(cuid())
     name           String
-    lastName       String?
     email          String    @unique
     emailVerified  DateTime?
+    termsAndConditionsAcceptedAt DateTime?
+    position String?
     image          String?
     identification String?
+    UserMonitoring UserMonitoring[] 
+    Country        Country[]
 
-    account  Account?
     sessions Session[]
 
     role   Role   @relation(fields: [roleId], references: [id])
     roleId String
 
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Country {
+    id String @id @default(cuid())
+    name String
+    User User[]
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
@@ -70,4 +57,20 @@ model Role {
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+}
+
+model UserMonitoring {
+    id String @id @default(cuid())
+    usage Int
+    description String
+    userId String
+    user User @relation(fields: [userId], references: [id])
+    createdAt DateTime @default(now())
+}
+
+
+enum Enum_RoleName {
+    Admin
+    Manager
+    User
 }

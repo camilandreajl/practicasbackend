@@ -1,9 +1,10 @@
-
+import { PrismaClient } from '@prisma/client';
 import { seedUsers } from './users';
-import { functions } from './functions';
+import { seedRoles } from './roles';
 
-
-export {
-    functions,
-    seedUsers,
+export const seedDatabase = async (prisma: PrismaClient) => {
+  // Seed roles first
+  await seedRoles(prisma);
+  // Then seed users
+  await seedUsers(prisma);
 };

@@ -69,4 +69,5 @@ export const generalTypes = gql`
       path: String!
     ): ExcelExportResponse!
   }
+  
 `;
