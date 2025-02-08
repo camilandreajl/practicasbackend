@@ -22,11 +22,13 @@ import { roleTypes } from './roles/types';
 import { countryTypes } from './country/types';
 import { userTypes } from './users/types';
 import { userResolvers } from './users/resolvers';
-
+import { countryResolvers } from './country/resolvers';
 const resolverArray: Resolver[] = [
   generalResolvers,
   userResolvers,
+  countryResolvers,
   ...cosmoResolvers,
+
 ].map((el) => {
   const mappedResolver: Resolver = { Query: {}, Mutation: {} };
 

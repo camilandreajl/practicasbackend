@@ -12,15 +12,48 @@ const userResolvers: Resolver = {
     },
     userMonitorings: async (parent, args, context) => {
       return await context.db.userMonitoring.findMany({
-        where: { userId: parent.id }
+        where: { userId: 
+          {
+            equals: parent.id
+          }
+        }
       })
     },
+    // countries: async (parent,args,context) => {
+    //   return await context.db.country.findMany({
+    //     where: { User: 
+    //       { 
+
+    //         some: { 
+    //           id:  {
+    //             equals: parent.id
+    //           }
+    //         } 
+    //       } 
+    //     }
+    //   })
+    // },
+    //CON SQL
     countries: async (parent,args,context) => {
-      return await context.db.country.findMany({
-        where: { User: { some: { id: parent.id } } }
+      console.log('parent :>> ',parent);
+      const result = await context.db.$queryRaw`
+      select *  from "Country" c 
+      join "_CountryToUser" ctu ON 
+      c.id = ctu."A" 
+      where ctu."B" = ${parent.id}
+      `
+      console.log('result :>> ',result);
+      return result
+    },
+    sessions: async (parent,args,context) => {
+      return await context.db.session.findMany({
+
+        where: { userId: parent.id }
       })
     }
+
   },
+
     Query: {        
     getUsers: async (parent, args, context) => {
          try {
