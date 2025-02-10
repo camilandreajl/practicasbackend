@@ -10,7 +10,7 @@ export const countryTypes = gql`
     name: String
     createdAt: DateTime
     updatedAt: DateTime
-    User: [User]
+    users: [User]
   }
 
   type Query {

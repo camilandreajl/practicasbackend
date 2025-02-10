@@ -54,7 +54,22 @@ const userResolvers: Resolver = {
 
   },
 
-    Query: {        
+    Query: {   
+      getUser: async (parent, args, context) => {
+        try {
+          // Fetch users from the database
+          return await context.db.user.findUnique(
+            {
+              where: {
+                email: args.email
+              }
+            }
+          );
+        } catch (error) {
+          console.error('Error fetching user:', error);
+          throw new Error('Failed to fetch user');
+        }
+      },     
     getUsers: async (parent, args, context) => {
          try {
            // Fetch users from the database
@@ -64,6 +79,15 @@ const userResolvers: Resolver = {
            throw new Error('Failed to fetch users');
          }
        },
+    getTopUsers: async (parent, args, context) => {
+      try {
+        // Fetch users from the database
+        return await context.db.user.findMany();
+      } catch (error) {
+        console.error('Error fetching users:', error);
+        throw new Error('Failed to fetch users');
+      }
+    }
     //getUser(email: String!): User
     // topUsers(
     //     startDate: DateTime!,

@@ -23,10 +23,16 @@ import { countryTypes } from './country/types';
 import { userTypes } from './users/types';
 import { userResolvers } from './users/resolvers';
 import { countryResolvers } from './country/resolvers';
+import { sessionResolvers } from './session/resolvers';
+import { userMonitoringResolvers } from './userMonitoring/resolvers';
+import { roleResolvers } from './roles/resolvers';
 const resolverArray: Resolver[] = [
   generalResolvers,
   userResolvers,
   countryResolvers,
+  userMonitoringResolvers,
+  sessionResolvers,
+  roleResolvers,
   ...cosmoResolvers,
 
 ].map((el) => {
